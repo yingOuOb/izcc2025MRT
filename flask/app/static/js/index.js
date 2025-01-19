@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showLocate();
     showImprisoned();
     showPointchart();
-    showDistance();
+    // showDistance();
     resizeMap();
     window.addEventListener('resize', resizeMap);
     window.addEventListener('load', resizeMap);
@@ -19,7 +19,7 @@ setInterval(showCollapse_time, 10000);
 setInterval(showPoint, 10000);
 setInterval(showLocate, 10000);
 setInterval(showImprisoned, 10000);
-setInterval(showDistance,10000);
+// setInterval(showDistance,10000);
 
 function resizeMap() {
     const img = document.querySelector('.MRT_map img[style*="display: block"]');
@@ -331,24 +331,24 @@ function getCurrentLocation() {
 }
 
 
-async function showDistance() {
-    const team = document.querySelector('#team').innerHTML;
-    const { distance, location } = await getCurrentLocation();
-    const distanceInKm = (distance / 1000).toFixed(1);
-    try {
-        const response = await fetch(`/api/team/${team}`);
-        const data = await response.json();
-        if (data.target_location) {
-            if (location) {
-                document.getElementById('distance_label').textContent = `( 你們已到${data.target_location}站 )`;
-            } else {
-                document.getElementById('distance_label').textContent = `( 你們距離${data.target_location}站 ${distanceInKm} km )`;
-            }
-        }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
+// async function showDistance() {
+//     const team = document.querySelector('#team').innerHTML;
+//     const { distance, location } = await getCurrentLocation();
+//     const distanceInKm = (distance / 1000).toFixed(1);
+//     try {
+//         const response = await fetch(`/api/team/${team}`);
+//         const data = await response.json();
+//         if (data.target_location) {
+//             if (location) {
+//                 document.getElementById('distance_label').textContent = `( 你們已到${data.target_location}站 )`;
+//             } else {
+//                 document.getElementById('distance_label').textContent = `( 你們距離${data.target_location}站 ${distanceInKm} km )`;
+//             }
+//         }
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//     }
+// }
 
 
 document.addEventListener("DOMContentLoaded", async function() {

@@ -1,7 +1,7 @@
 //ready
 document.addEventListener("DOMContentLoaded", () => {
     mission_label();
-    showDistance();
+    // showDistance();
 });
 
 function mission_label() {
