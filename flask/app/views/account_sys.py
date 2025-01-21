@@ -20,7 +20,7 @@ def callback():
         current_user = bearer_client.users.get_current_user()
         session["token"] = access_token
         session.permanent = True
-        _, is_admin = core.check_player(current_user.id)
+        _, is_admin = core.check_player(current_user.username)
         
         log.info(f"User {current_user.username} is logged in")
         

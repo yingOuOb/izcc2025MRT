@@ -113,6 +113,9 @@ def join_team(name: str, player_name: str):
 
     core.teams[name].admins.append(player_name)
     
+    if player_name in core.unknown_players: 
+        core.unknown_players.remove(player_name)
+    
     return STATUS_CODES.S00000
 
 

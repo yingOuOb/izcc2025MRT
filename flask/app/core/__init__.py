@@ -30,6 +30,7 @@ class Core:
         self.collapse_list = COLLAPSE_LIST.copy()
         self.collapse_scheduler = BackgroundScheduler()
         self.prison_scheduler = BackgroundScheduler()
+        self.unknown_players = []
         
         self.create_team("admins", admins=ADMINS.copy())
         
@@ -286,6 +287,9 @@ class Core:
             
             if player in self.teams[team].players:
                 return self.teams[team], player in ADMINS
+            
+        if player not in self.unknown_players:
+            self.unknown_players.append(player)
             
         return None, player in ADMINS
     

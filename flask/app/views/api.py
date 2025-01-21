@@ -209,6 +209,9 @@ def join_team(name: str, player_name: str):
             core.teams[current_team].players.remove(player_name)
 
     core.teams[name].players.append(player_name)
+    
+    if player_name in core.unknown_players: 
+        core.unknown_players.remove(player_name)
         
     return STATUS_CODES.S00000
 
@@ -605,3 +608,20 @@ def gps_location(name: str, latitude: float, longitude: float):
     log.debug(f"Team {name} is at {longitude}, {latitude}")
     
     return jsonify(core.check_pos(name, pgh.encode(latitude, longitude)))
+
+
+@api.route("/users")
+def get_users():
+    """
+    Get the `list` of unknown users.
+    
+    Returns
+    -------
+    users: :type:`list`
+        The list of unknown users.
+    """
+    
+    if not is_admin():
+        abort(403)
+    
+    return jsonify(core.unknown_players)
