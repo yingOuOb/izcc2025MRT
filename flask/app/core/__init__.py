@@ -83,7 +83,7 @@ class Core:
     def init_prison(self) -> None:
         
         if self.prison_scheduler.running:
-            self.prison_scheduler.shutdown()
+            return None
             
         self.prison_scheduler.add_job(self._release, "interval", minutes=1)
         self.prison_scheduler.start()
@@ -455,9 +455,10 @@ class Core:
             log.warning(f"Team {name} has finished the mission.")
             return None
         
-        if self.teams[name].location != self.teams[name].target_location:
-            log.warning(f"Team {name} is not in the target location.")
-            return None
+        # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
+        # if self.teams[name].location != self.teams[name].target_location:
+        #     log.warning(f"Team {name} is not in the target location.")
+        #     return None
         
         station = self.metro.find_station(self.teams[name].target_location)
         
