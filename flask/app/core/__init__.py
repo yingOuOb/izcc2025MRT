@@ -483,7 +483,10 @@ class Core:
         # 紀錄經過站點
         if station.name not in self.teams[name].stations:
             self.teams[name].stations.append(station.name)
-                
+
+        # 達成組合
+        self.check_combo(name)
+
         # 初始化
         self.teams[name].current_mission_finished = True
         self.teams[name].location = self.teams[name].target_location
