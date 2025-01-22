@@ -29,7 +29,7 @@ def index():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
-        return render_template("index.html", current_user=current_user.username, team=team, graph=core.metro.graph)
+        return render_template("index.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url)
     
     return redirect("/login")
 

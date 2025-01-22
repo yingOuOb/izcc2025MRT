@@ -9,8 +9,21 @@ body {
     padding: 10px 20px;
 }
 
+.user_info {
+    display: flex; /* 使用 Flexbox */
+    align-items: center; /* 垂直對齊 */
+    gap: 20px; /* 控制圖片和文字之間的間距 */
+}
+
+.user_info img {
+    width: 50px; /* 調整圖片大小 */
+    height: 50px;
+    border-radius: 50%; /* 圖片變成圓形 */
+}
+
 .user_info p {
     font-size: 200%;
+    margin: 0; /* 清除段落的預設外邊距 */
 }
 
 .nav {
@@ -24,7 +37,7 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 50px rgba(159, 162, 177, .8);
     font-size: 200%;
-    margin-right: 20vw;
+    margin-right: 15vw;
 }
 
 .nav-item {
