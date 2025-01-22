@@ -308,7 +308,7 @@ class Core:
             if combo["name"] in self.teams[name].combos:
                 continue
             
-            if combo["stations"] == set(combo["stations"]).intersection(set(self.teams[name].stations)):
+            if set(combo["stations"]) == set(combo["stations"]).intersection(set(self.teams[name].stations)):
                 self.teams[name].point += combo["point"]
                 self.teams[name].combos.append(combo["name"])
                 self.teams[name].add_point_log(combo["point"], f"Achieved combo {combo['name']}")

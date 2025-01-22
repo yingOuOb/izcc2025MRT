@@ -138,6 +138,21 @@ def set_location(name: str, location: str):
     
     return STATUS_CODES.S00000
 
+@admin_api.route("/set_target_location/<name>/<location>")
+def set_target_location(name: str, location: str):
+    
+    if not is_admin():
+        abort(403)
+                
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+        
+    if name not in core.teams:
+        return STATUS_CODES.S00004
+        
+    core.teams[name].target_location = location
+    
+    return STATUS_CODES.S00000
 
 @admin_api.route("/imprison/<name>/<time>")
 def imprison(name: str, time: int):
