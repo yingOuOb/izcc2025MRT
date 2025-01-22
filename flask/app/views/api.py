@@ -548,8 +548,9 @@ def skip_mission(name: str):
     if core.teams[name].current_mission_finished:
         return STATUS_CODES.S50003
     
-    if core.teams[name].target_location != core.teams[name].location:
-        return STATUS_CODES.S40002
+    # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
+    # if core.teams[name].target_location != core.teams[name].location:
+    #     return STATUS_CODES.S40002
     
     core.skip_mission(name=name)
     return STATUS_CODES.S00000
