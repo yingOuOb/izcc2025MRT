@@ -196,7 +196,7 @@ async function showPoint() {
         const response = await fetch(`/api/teams`);
         const data = await response.json();
         const teams = document.querySelectorAll(".team");
-        const maxScore = 3000;
+        const maxScore = 1000;
 
         data.forEach(teamData => {
             const chineseNumeral = teamData.name.charAt(0); // 假設隊名的第一個字符是中文數字
@@ -281,54 +281,54 @@ async function showImprisoned() {
 }
 
 
-function getCurrentLocation() {
-    return new Promise((resolve, reject) => {
-        const team = document.querySelector('#team').innerHTML;
-        if (navigator.geolocation) {
-            // 使用高精度模式
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 10000, // 10 秒超時
-                maximumAge: 0 // 不使用緩存位置
-            };
+// function getCurrentLocation() {
+//     return new Promise((resolve, reject) => {
+//         const team = document.querySelector('#team').innerHTML;
+//         if (navigator.geolocation) {
+//             // 使用高精度模式
+//             const options = {
+//                 enableHighAccuracy: true,
+//                 timeout: 10000, // 10 秒超時
+//                 maximumAge: 0 // 不使用緩存位置
+//             };
             
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                try {
-                    const { latitude, longitude } = position.coords;
-                    const response = await fetch(`/api/gps_location/${team}/${latitude}/${longitude}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP 錯誤！狀態: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    resolve({ distance: data.distance, location: data.location });
-                } catch (error) {
-                    console.error('獲取數據時出錯:', error);
-                    reject(error);
-                }
-            }, (error) => {
-                // 處理定位錯誤
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert('使用者拒絕了地理位置請求。');
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert('位置信息不可用。');
-                        break;
-                    case error.TIMEOUT:
-                        alert('請求地理位置超時。');
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        alert('發生未知錯誤。');
-                        break;
-                }
-                reject(error);
-            }, options);
-        } else {
-            alert('對不起，您的裝置不支援地理位置功能。');
-            reject(new Error('Geolocation not supported'));
-        }
-    });
-}
+//             navigator.geolocation.getCurrentPosition(async (position) => {
+//                 try {
+//                     const { latitude, longitude } = position.coords;
+//                     const response = await fetch(`/api/gps_location/${team}/${latitude}/${longitude}`);
+//                     if (!response.ok) {
+//                         throw new Error(`HTTP 錯誤！狀態: ${response.status}`);
+//                     }
+//                     const data = await response.json();
+//                     resolve({ distance: data.distance, location: data.location });
+//                 } catch (error) {
+//                     console.error('獲取數據時出錯:', error);
+//                     reject(error);
+//                 }
+//             }, (error) => {
+//                 // 處理定位錯誤
+//                 switch(error.code) {
+//                     case error.PERMISSION_DENIED:
+//                         alert('使用者拒絕了地理位置請求。');
+//                         break;
+//                     case error.POSITION_UNAVAILABLE:
+//                         alert('位置信息不可用。');
+//                         break;
+//                     case error.TIMEOUT:
+//                         alert('請求地理位置超時。');
+//                         break;
+//                     case error.UNKNOWN_ERROR:
+//                         alert('發生未知錯誤。');
+//                         break;
+//                 }
+//                 reject(error);
+//             }, options);
+//         } else {
+//             alert('對不起，您的裝置不支援地理位置功能。');
+//             reject(new Error('Geolocation not supported'));
+//         }
+//     });
+// }
 
 
 // async function showDistance() {
