@@ -94,40 +94,26 @@ function add_point() {
 }
 
 function unknow_user_list() {
-    const team = document.getElementById('team').textContent;
-    fetch(`/api/users`)
-        .then(response => response.json())
-        .then(data => { 
-            const label = document.getElementById('unknow_user_list_label');
-            const userlist = document.getElementById('unknow_user_list');
-            userlist.innerHTML = '';
+    fetch('/api/users')
+    .then(response => response.json())
+    .then(data => {
+        const userList = document.getElementById('user_list');
+        userList.innerHTML = ''; 
 
-            if (data.unknown_users && data.unknown_users.length > 0) {
-                label.textContent = 'Unknown Users:';
-                data.unknown_users.forEach(user => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = user;
-                    
-                    listItem.style.cursor = 'pointer';
-                    listItem.addEventListener('click', () => {
-                        navigator.clipboard.writeText(user)
-                            .then(() => {
-                                alert(`Copied: ${user}`);
-                            })
-                            .catch(err => {
-                                console.error('Failed to copy text: ', err);
-                            });
-                    });
+        data.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.textContent = user;
+            
+            listItem.addEventListener('click', () => {
+                navigator.clipboard.writeText(user)
+                    .then(() => alert(`Copied: ${user}`))
+                    .catch(err => console.error('Failed to copy text:', err));
+            });
 
-                    userlist.appendChild(listItem);
-                });
-            } else {
-                label.textContent = '無發現漂流玩家';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching unknown user data:', error);
-            const label = document.getElementById('unknow_user_list_label');
-            label.textContent = 'Error loading unknown user data.';
+            userList.appendChild(listItem);
         });
+    })
+    .catch(error => {
+        console.error('Error fetching user data:', error);
+    });
 }
