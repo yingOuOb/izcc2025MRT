@@ -62,7 +62,7 @@ def combo():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
-        return render_template("combo.html", current_user=current_user.username, team=team, graph=core.metro.graph, combos=load_data("combo"))
+        return render_template("combo.html", current_user=current_user.username, team=team, graph=core.metro.graph, combos=load_data("combo"), avater_url=current_user.avatar_url)
     
     return redirect("/")
 
@@ -75,7 +75,7 @@ def team_admin():
         team, _ = core.check_player(current_user.username)
         
         if is_admin():
-            return render_template("team_admin.html", current_user=current_user.username, team=team, graph=core.metro.graph)
+            return render_template("team_admin.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url)
         
     return redirect("/")
 
