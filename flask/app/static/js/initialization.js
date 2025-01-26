@@ -97,7 +97,7 @@ function unknow_user_list() {
     fetch('/api/users')
     .then(response => response.json())
     .then(data => {
-        const userList = document.getElementById('user_list');
+        const userList = document.getElementById('unknow_user_list');
         userList.innerHTML = ''; 
 
         data.forEach(user => {
