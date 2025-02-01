@@ -6,10 +6,10 @@
         "Difficult": 2
     },
     "景安": {
-        "Mission": "跟中和四面佛合照",
-        "Tips": "走到對面右轉",
-        "Exit": "景平路",
-        "Difficult": 1
+        "Mission": "全員模仿警察柴犬的動作並與柴犬燈箱合影",
+        "Exit": "N/A",
+        "Tips": "迴龍蘆洲",
+        "Difficult": 2
     },
     "永安市場": {
         "Mission": "到國立圖書館旁的廣場跳早操，跳完後擺IZCC pose拍照",
@@ -244,7 +244,7 @@
         "Tips": "如圖"
     },
     "信義安和": {
-        "Mission": "在消防局前面擺如圖動作拍照",
+        "Mission": "在消防局前面拍照",
         "Exit": "2號出口",
         "Difficult": 1,
         "Tips": "如圖"
