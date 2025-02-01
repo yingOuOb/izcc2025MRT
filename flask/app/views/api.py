@@ -100,7 +100,7 @@ def station(name: str):
             unlock_stations.extend(team.stations)
     
     data = station.__dict__
-    if station.hidden and name not in unlock_stations:
+    if station.hidden and (name not in unlock_stations):
         data["mission"] = "隱藏"
         data["tips"] = "隱藏"
         data["exit"] = "隱藏"
