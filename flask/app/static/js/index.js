@@ -123,8 +123,8 @@ async function station_info(station_name) {
             lebel_is_special = "否"
         }
         const label_team = data.team ? data.team : "無人佔領";
-        const label_depiction = (!data.is_special || station_name === team_data.location) ? data.mission : "隱藏";
-        const label_exit = (!data.is_special || station_name === team_data.location) ? data.exit : "隱藏";
+        const label_depiction = data.mission;
+        const label_exit = data.exit;
         const lebel_difficult = data.difficult === 1 ? "簡單" : data.difficult === 2 ? "普通" : data.difficult === 3 ? "困難" : null;
 
         station_name = station_name.replace("_", "/");

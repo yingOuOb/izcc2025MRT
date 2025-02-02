@@ -66,10 +66,12 @@ def stations():
         team, _ = core.check_player(current_user.username)
         if team is not None:
             unlock_stations.extend(team.stations)
+            unlock_stations.append(team.target_location)
+            unlock_stations.append(team.location)
     
     for station_name in graph.keys():
         station = core.metro.find_station(station_name)
-        data.append(station.__dict__)
+        data.append(station.__dict__.copy())
         if station.hidden and (station_name not in unlock_stations):
             data[-1]["mission"] = "隱藏"
             data[-1]["tips"] = "隱藏"
@@ -98,8 +100,12 @@ def station(name: str):
         team, _ = core.check_player(current_user.username)
         if team is not None:
             unlock_stations.extend(team.stations)
+            unlock_stations.append(team.target_location)
+            unlock_stations.append(team.location)
+            log.debug(f"Unlock stations: {unlock_stations}")
     
-    data = station.__dict__
+    data = station.__dict__.copy()
+    log.debug(f"Station: {data}")
     if station.hidden and (name not in unlock_stations):
         data["mission"] = "隱藏"
         data["tips"] = "隱藏"
