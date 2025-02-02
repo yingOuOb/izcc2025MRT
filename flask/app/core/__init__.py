@@ -425,8 +425,7 @@ class Core:
             self.teams[name].current_mission_finished = False
             
         self.teams[name].current_card = None
-        # self.metro.find_station(location).hidden = False
-        self.teams[name].stations.append(location)
+        self.metro.find_station(location).hidden = False
         
         log.debug(f"The target location of team {name} is {location}.")
         
