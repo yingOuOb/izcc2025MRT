@@ -517,9 +517,9 @@ class Core:
             log.warning(f"Team {name} has finished the mission.")
             return None
         
-        if self.teams[name].target_location != self.teams[name].location:
-            log.warning(f"Team {name} hasn't arrived.")
-            return None
+        # if self.teams[name].target_location != self.teams[name].location:
+        #     log.warning(f"Team {name} hasn't arrived.")
+        #     return None
 
         # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
         # if self.teams[name].location != self.teams[name].target_location:
