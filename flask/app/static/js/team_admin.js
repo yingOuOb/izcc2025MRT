@@ -1,8 +1,16 @@
 //ready
 document.addEventListener("DOMContentLoaded", () => {
     mission_label();
+    // get_pos();
     // showDistance();
 });
+
+async function get_pos() {
+    const team = document.querySelector("#team").innerHTML;
+    const response = await fetch(`/api/get_pos/${team}`);
+    const responseText = response.text()
+    document.getElementById("pos_label").textContent = `目前位置 : ${responseText}`;
+}
 
 function mission_label() {
     const team = document.querySelector("#team").innerHTML;
@@ -107,6 +115,32 @@ function missionAPI() {
                     icon: "warning",
                     text: "Please finish mission first.",
                     confirmButtonText: "Close"
+                });
+            }
+        })
+}
+
+async function arrive_target() {
+    const team = document.querySelector("#team").innerHTML;
+    const response = await fetch(`/api/get_target/${team}`);
+    const location = await response.text();
+    fetch(`/api/arrive_target/${team}/${location}`).then(response => response.text())
+        .then(response => {
+            if (response === "Success" || response === "成功") {
+                Swal.fire({
+                    title: "成功抵達",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    willClose: () => {
+                        mission_label();
+                    }
+                });
+            }
+            else {
+                Swal.fire({
+                    title: response,
+                    icon: "warning",
+                    confirmButtonText: "OK"
                 });
             }
         })

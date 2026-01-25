@@ -261,7 +261,33 @@ def leave_team(player_name: str):
             
     return STATUS_CODES.S30002
     
+
+@api.route("/get_pos/<name>")
+def get_pos(name: str):
+    if not is_admin():
+        abort(403)
+
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+        
+    if name not in core.teams:
+        return STATUS_CODES.S00004
     
+    return core.teams[name].location
+
+@api.route("/get_target/<name>")
+def get_target(name: str):
+    if not is_admin():
+        abort(403)
+
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+        
+    if name not in core.teams:
+        return STATUS_CODES.S00004
+    
+    return core.teams[name].target_location
+
 @api.route("/move/<name>")
 def move(name: str):
     """
@@ -370,6 +396,53 @@ def move_to_location(name: str, location: str):
         
     return STATUS_CODES.S00000
 
+@api.route("/arrive_target/<name>/<location>")
+def arrive_target(name: str, location: str):
+    """
+    The second stage of this round. \\
+    Set the target station of the team.
+    
+    Parameters
+    ----------
+    name: :type:`str`
+        The name of the team.
+        
+    location: :type:`str`
+        The location of the team.
+        
+    Returns
+    -------
+    result: :type:`str`
+        The status code.
+        
+    Status Codes
+    ------------
+    - S00000: Success
+    - S00004: The team does not exist.
+    - S20002: The team is imprisoned.
+    - S50002: The current mission is not finished.
+    - S00006: The location does not exist.
+    - S99999: The game is not running.
+    """
+    
+    if not is_admin():
+        abort(403)
+                
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+        
+    if name not in core.teams:
+        return STATUS_CODES.S00004
+        
+    if core.teams[name].is_imprisoned:
+        return STATUS_CODES.S20002
+    
+    if not core.teams[name].current_mission_finished:
+        return STATUS_CODES.S50002
+    
+    core.arrive_target(name=name, location=location)
+        
+    return STATUS_CODES.S00000
 
 @api.route("/add_point/<name>/<point>")
 def add_point(name: str, point: int):

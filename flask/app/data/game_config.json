@@ -38,8 +38,7 @@
         "輔大",
         "丹鳳",
         "迴龍",
-        "動物園",
-        "小碧潭"
+        "動物園"
     ],
     "is_special": 0.3,
     "is_hidden": 0.1,
@@ -54,7 +53,7 @@
     "collapse": [
         {
             "status": 1,
-            "time": "15:00",
+            "time": "21:10",
             "final": false,
             "stations": [
                 "明德",
@@ -82,7 +81,7 @@
         },
         {
             "status": 2,
-            "time": "16:00",
+            "time": "21:20",
             "final": false,
             "stations": [
                 "劍潭",
@@ -107,7 +106,7 @@
         },
         {
             "status": 3,
-            "time": "17:00",
+            "time": "21:30",
             "final": true,
             "stations": []
         }

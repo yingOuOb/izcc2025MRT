@@ -430,7 +430,65 @@ class Core:
         log.debug(f"The target location of team {name} is {location}.")
         
         return None
+
+    def arrive_target(self, name: str, location: str) -> None:
+        """
+        Confirm if the team arrive.
         
+        Parameters
+        ----------
+        name: :type:`str`
+            The name of the team.
+
+        location: :type:`str`
+            The name of the station the team arriving.
+        """
+        if self.is_running is False:
+            log.warning("Game ended.")
+            return None
+        
+        if name not in self.teams.keys():
+            log.warning(f"Team {name} does not exist.")
+            return None
+        
+        if self.teams[name].location == self.teams[name].target_location:
+            log.warning(f"Team {name} hasn't moved.")
+            return None
+        
+        self.teams[name].location = self.teams[name].target_location
+        station = self.teams[name].location
+        
+        
+        # 達成組合
+        self.check_combo(name)
+        
+        # 過路費
+        if station.team is not None and station.team != name:
+            self.teams[name].point -= station.point
+            self.teams[name].add_point_log(-station.point, f"To team {station.team}")
+            
+            self.teams[station.team].point += station.point
+            self.teams[station.team].add_point_log(station.point, f"From team {name}")
+            
+        # 監獄
+        if station.is_prison:
+            self.teams[name].is_imprisoned = True
+            self.teams[name].imprisoned_time = random.randint(IMPRISONED_TIME["min"], IMPRISONED_TIME["max"])
+            self.teams[name].current_mission_finished = True
+            self.teams[name].stations.append(station.name)
+            
+            log.debug(f"Team {name} is imprisoned.")
+            
+        else:
+            self.teams[name].current_mission_finished = False
+            
+        # self.teams[name].current_card = None
+        # self.metro.find_station(location).hidden = False
+        
+        log.debug(f"team {name} arrived at {location}.")
+        self.teams[name].add_point_log(0, f"Arrived at {location}")
+        
+        return None 
         
     def finish_mission(self, name: str) -> str | None:
         """
@@ -459,6 +517,10 @@ class Core:
             log.warning(f"Team {name} has finished the mission.")
             return None
         
+        if self.teams[name].target_location != self.teams[name].location:
+            log.warning(f"Team {name} hasn't arrived.")
+            return None
+
         # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
         # if self.teams[name].location != self.teams[name].target_location:
         #     log.warning(f"Team {name} is not in the target location.")
@@ -525,6 +587,10 @@ class Core:
         if self.teams[name].current_mission_finished:
             log.warning(f"Team {name} has finished the mission.")
             return None
+        
+        # if self.teams[name].target_location != self.teams[name].location:
+        #     log.warning(f"Team {name} hasn't arrived.")
+        #     return None
         
         # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
         # if self.teams[name].location != self.teams[name].target_location:
