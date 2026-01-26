@@ -1,15 +1,18 @@
 //ready
 document.addEventListener("DOMContentLoaded", () => {
     mission_label();
-    // get_pos();
+    get_pos();
     // showDistance();
 });
 
 async function get_pos() {
     const team = document.querySelector("#team").innerHTML;
-    const response = await fetch(`/api/get_pos/${team}`);
-    const responseText = response.text()
-    document.getElementById("pos_label").textContent = `目前位置 : ${responseText}`;
+    fetch(`/api/team/${team}`)
+        .then(response => response.json())
+        .then(data => {
+           cur_location = data.location;
+           document.getElementById("pos_label").textContent = `目前位置 : ${cur_location}`;
+        })
 }
 
 function mission_label() {
@@ -19,7 +22,12 @@ function mission_label() {
         .then(data => {
             now_status = data.current_mission_finished
             if (now_status) {
-                document.getElementById("mission_label").textContent = "目前狀態 : 沒有進行中的任務 請按骰子";
+                if (now_status === 2) {
+                    document.getElementById("mission_label").textContent = "目前狀態 : 移動中 請前往目標站點後抵達站點";
+                }
+                else {
+                    document.getElementById("mission_label").textContent = "目前狀態 : 沒有進行中的任務 請按骰子";
+                }
             }
             else {
                 document.getElementById("mission_label").textContent = "目前狀態 : 任務進行中 請按任務完成";
@@ -122,9 +130,7 @@ function missionAPI() {
 
 async function arrive_target() {
     const team = document.querySelector("#team").innerHTML;
-    const response = await fetch(`/api/get_target/${team}`);
-    const location = await response.text();
-    fetch(`/api/arrive_target/${team}/${location}`).then(response => response.text())
+    fetch(`/api/arrive_target/${team}`).then(response => response.text())
         .then(response => {
             if (response === "Success" || response === "成功") {
                 Swal.fire({

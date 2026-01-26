@@ -262,31 +262,31 @@ def leave_team(player_name: str):
     return STATUS_CODES.S30002
     
 
-@api.route("/get_pos/<name>")
-def get_pos(name: str):
-    if not is_admin():
-        abort(403)
+# @api.route("/get_pos/<name>")
+# def get_pos(name: str):
+#     if not is_admin():
+#         abort(403)
 
-    if core.is_running is False:
-        return STATUS_CODES.S99999
+#     if core.is_running is False:
+#         return STATUS_CODES.S99999
         
-    if name not in core.teams:
-        return STATUS_CODES.S00004
+#     if name not in core.teams:
+#         return STATUS_CODES.S00004
     
-    return core.teams[name].location
+#     return core.teams[name].location
 
-@api.route("/get_target/<name>")
-def get_target(name: str):
-    if not is_admin():
-        abort(403)
+# @api.route("/get_target/<name>")
+# def get_target(name: str):
+#     if not is_admin():
+#         abort(403)
 
-    if core.is_running is False:
-        return STATUS_CODES.S99999
+#     if core.is_running is False:
+#         return STATUS_CODES.S99999
         
-    if name not in core.teams:
-        return STATUS_CODES.S00004
+#     if name not in core.teams:
+#         return STATUS_CODES.S00004
     
-    return core.teams[name].target_location
+#     return core.teams[name].target_location
 
 @api.route("/move/<name>")
 def move(name: str):
@@ -396,8 +396,8 @@ def move_to_location(name: str, location: str):
         
     return STATUS_CODES.S00000
 
-@api.route("/arrive_target/<name>/<location>")
-def arrive_target(name: str, location: str):
+@api.route("/arrive_target/<name>")
+def arrive_target(name: str):
     """
     The second stage of this round. \\
     Set the target station of the team.
@@ -406,10 +406,7 @@ def arrive_target(name: str, location: str):
     ----------
     name: :type:`str`
         The name of the team.
-        
-    location: :type:`str`
-        The location of the team.
-        
+    
     Returns
     -------
     result: :type:`str`
@@ -440,7 +437,7 @@ def arrive_target(name: str, location: str):
     if not core.teams[name].current_mission_finished:
         return STATUS_CODES.S50002
     
-    core.arrive_target(name=name, location=location)
+    core.arrive_target(name=name)
         
     return STATUS_CODES.S00000
 

@@ -182,7 +182,7 @@ async function showLocate() {
             if (teamNumber !== undefined) {
                 const locationElement = document.getElementById(`team${teamNumber}_location`);
                 if (locationElement) {
-                    locationElement.textContent = team.is_imprisoned ? `監獄⛓️` : `${team.target_location}`;
+                    locationElement.textContent = team.is_imprisoned ? `監獄⛓️` : `${team.location}`;
                 }
             }
         });

@@ -400,38 +400,44 @@ class Core:
         
         station = self.metro.find_station(location)
         self.teams[name].target_location = station.name
+
+        self.teams[name].current_mission_finished = 2 #Another secret status
         
-        # 達成組合
-        self.check_combo(name)
+        ############
+        # # 達成組合
+        # self.check_combo(name)
         
-        # 過路費
-        if station.team is not None and station.team != name:
-            self.teams[name].point -= station.point
-            self.teams[name].add_point_log(-station.point, f"To team {station.team}")
+        # # 過路費
+        # if station.team is not None and station.team != name:
+        #     self.teams[name].point -= station.point
+        #     self.teams[name].add_point_log(-station.point, f"To team {station.team}")
             
-            self.teams[station.team].point += station.point
-            self.teams[station.team].add_point_log(station.point, f"From team {name}")
+        #     self.teams[station.team].point += station.point
+        #     self.teams[station.team].add_point_log(station.point, f"From team {name}")
             
-        # 監獄
-        if station.is_prison:
-            self.teams[name].is_imprisoned = True
-            self.teams[name].imprisoned_time = random.randint(IMPRISONED_TIME["min"], IMPRISONED_TIME["max"])
-            self.teams[name].current_mission_finished = True
-            self.teams[name].stations.append(station.name)
+        # # 監獄
+        # if station.is_prison:
+        #     self.teams[name].is_imprisoned = True
+        #     self.teams[name].imprisoned_time = random.randint(IMPRISONED_TIME["min"], IMPRISONED_TIME["max"])
+        #     self.teams[name].current_mission_finished = True
+        #     self.teams[name].stations.append(station.name)
             
-            log.debug(f"Team {name} is imprisoned.")
+        #     log.debug(f"Team {name} is imprisoned.")
             
-        else:
-            self.teams[name].current_mission_finished = False
+        # else:
+        #     self.teams[name].current_mission_finished = False
+        ###########
             
         self.teams[name].current_card = None
         self.metro.find_station(location).hidden = False
+
         
         log.debug(f"The target location of team {name} is {location}.")
+        self.teams[name].add_point_log(0, f"Going to {self.teams[name].target_location}")
         
         return None
 
-    def arrive_target(self, name: str, location: str) -> None:
+    def arrive_target(self, name: str) -> None:
         """
         Confirm if the team arrive.
         
@@ -439,9 +445,6 @@ class Core:
         ----------
         name: :type:`str`
             The name of the team.
-
-        location: :type:`str`
-            The name of the station the team arriving.
         """
         if self.is_running is False:
             log.warning("Game ended.")
@@ -456,7 +459,7 @@ class Core:
             return None
         
         self.teams[name].location = self.teams[name].target_location
-        station = self.teams[name].location
+        station = self.metro.find_station(self.teams[name].location)
         
         
         # 達成組合
@@ -485,8 +488,8 @@ class Core:
         # self.teams[name].current_card = None
         # self.metro.find_station(location).hidden = False
         
-        log.debug(f"team {name} arrived at {location}.")
-        self.teams[name].add_point_log(0, f"Arrived at {location}")
+        log.debug(f"team {name} arrived at {self.teams[name].location}.")
+        self.teams[name].add_point_log(0, f"Arrived at {self.teams[name].location}")
         
         return None 
         
