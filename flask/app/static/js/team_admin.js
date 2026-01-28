@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // showDistance();
 });
 
-async function get_pos() {
+function get_pos() {
     const team = document.querySelector("#team").innerHTML;
     fetch(`/api/team/${team}`)
         .then(response => response.json())
@@ -24,6 +24,9 @@ function mission_label() {
             if (now_status) {
                 if (now_status === 2) {
                     document.getElementById("mission_label").textContent = "目前狀態 : 移動中 請前往目標站點後抵達站點";
+                }
+                else if(data.is_imprisoned){
+                    document.getElementById("mission_label").textContent = "目前狀態 : 監獄 請等倒數結束後執行骰子";
                 }
                 else {
                     document.getElementById("mission_label").textContent = "目前狀態 : 沒有進行中的任務 請按骰子";
@@ -128,7 +131,7 @@ function missionAPI() {
         })
 }
 
-async function arrive_target() {
+function arrive_target() {
     const team = document.querySelector("#team").innerHTML;
     fetch(`/api/arrive_target/${team}`).then(response => response.text())
         .then(response => {
@@ -144,7 +147,8 @@ async function arrive_target() {
             }
             else {
                 Swal.fire({
-                    title: response,
+                    title: "錯誤",
+                    text: "無法完成指令，請稍後再試。",
                     icon: "warning",
                     confirmButtonText: "OK"
                 });
