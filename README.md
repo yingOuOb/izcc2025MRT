@@ -250,6 +250,7 @@
 - [A1u](https://github.com/ayooooou)：前端開發、介面設計、捷運圖製作、串接API、伺服器維運、文件撰寫
 
 ### 其他開發者
+
 - [samuelhsieh0829](https://github.com/samuelhsieh0829)：前端GPS定位、伺服器維運、除錯
 - [FranzLee](https://github.com/FranzLee)：擲骰子介面撰寫
 - [IanWen](https://github.com/IanWen103026)：優化擲骰子介面設計
@@ -259,3 +260,4 @@
 - [2021](https://github.com/IZCC111/izcc-2021-winter-metro)
 - [2022](https://github.com/Timothychen00/izcc2022MRT)
 - [2023](https://github.com/ddd-dong/izcc2023MRT)
+- [2024](https://github.com/lucasw0908/izcc2024MRT)

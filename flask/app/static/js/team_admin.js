@@ -20,10 +20,9 @@ function mission_label() {
     fetch(`/api/team/${team}`)
         .then(response => response.json())
         .then(data => {
-            now_status = data.current_mission_finished
-            if (now_status) {
-                if (now_status === 2) {
-                    document.getElementById("mission_label").textContent = "目前狀態 : 移動中 請前往目標站點後抵達站點";
+            if (data.current_mission_finished) {
+                if (data.location !== data.target_location) {
+                    document.getElementById("mission_label").textContent = "目前狀態 : 移動中 請前往目標站點後按抵達站點";
                 }
                 else if(data.is_imprisoned){
                     document.getElementById("mission_label").textContent = "目前狀態 : 監獄 請等倒數結束後執行骰子";

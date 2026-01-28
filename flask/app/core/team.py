@@ -15,7 +15,7 @@ class Team:
         self.point: int = 10
         self.step: int = 0
         
-        self.current_mission_finished: bool | int = True # 用2表示正在移動過程
+        self.current_mission_finished: bool = True # 用2表示正在移動過程 # 開玩笑的別這麼做
         self.current_card: Optional[str] = None
         
         self.imprisoned_time: int = 0

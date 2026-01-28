@@ -318,6 +318,7 @@ class Core:
                 log.debug(f"Team {name} achieved combo {combo['name']}.")
     
     
+    # DFS🔥🔥🔥
     def _move(self, current_station: str, target_deep: int, deep: int=1) -> list[str]:
         choice = []
         
@@ -379,7 +380,7 @@ class Core:
     
     def move_to_location(self, name: str, location: str) -> None:
         """
-        Move the team to the location.
+        Set the target location of the team to move.
         
         Parameters
         ----------
@@ -401,7 +402,7 @@ class Core:
         station = self.metro.find_station(location)
         self.teams[name].target_location = station.name
 
-        self.teams[name].current_mission_finished = 2 #Another secret status
+        # self.teams[name].current_mission_finished = 2 # Another secret status for frontend # No no no Don't do this
         
         ############
         # # 達成組合
@@ -426,7 +427,7 @@ class Core:
             
         # else:
         #     self.teams[name].current_mission_finished = False
-        ###########
+        ############
             
         self.teams[name].current_card = None
         self.metro.find_station(location).hidden = False
@@ -591,9 +592,10 @@ class Core:
             log.warning(f"Team {name} has finished the mission.")
             return None
         
-        # if self.teams[name].target_location != self.teams[name].location:
-        #     log.warning(f"Team {name} hasn't arrived.")
-        #     return None
+        # 需先按下抵達才可跳過
+        if self.teams[name].target_location != self.teams[name].location:
+            log.warning(f"Team {name} hasn't arrived.")
+            return None
         
         # 廢案 由於GPS在捷運站精確度不達預期標準 因此取消此功能
         # if self.teams[name].location != self.teams[name].target_location:

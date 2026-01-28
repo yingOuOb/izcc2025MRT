@@ -135,15 +135,18 @@ class MetroSystem:
             
     def _load_location(self, url: str, save: bool=False) -> None:
         
+        # 取得並寫入地理位置
         if self.station_location:
             return None
         
         response: list[dict] = requests.get(url, headers=headers).json()
         
+        # API可能被rate limit，改用本地資料
         if "message" in response:
             log.error(response["message"])
             response = load_data("station_location")
-                
+
+        # 主動儲存API資料到本地        
         if save:
             with open(os.path.join(BASEDIR, "data", "station_location.json"), "r+", encoding="utf-8") as file:
                 data: list = json.load(file)
@@ -151,7 +154,8 @@ class MetroSystem:
                     if station not in data:
                         data.append(station)
                 json.dump(data, file, ensure_ascii=False, indent=4)
-                
+
+        # 寫入地理位置        
         self.station_location = {sl["StationName"]["Zh_tw"]: sl["StationPosition"]["GeoHash"] for sl in response}
         
         
@@ -175,6 +179,7 @@ class MetroSystem:
                         data.append(line)
                 json.dump(data, file, ensure_ascii=False, indent=4)
         
+        # 把所有API取得的站點以及任務內容等寫入Station物件並加入MetroSystem的屬性
         for line in response:
             for station in line["Stations"]:
                 station: dict[str, Any]
@@ -189,16 +194,19 @@ class MetroSystem:
                 station["geohash"] = self.station_location.get(current_station_name, None)
                 
                 setattr(self, station["StationName"]["Zh_tw"], Station(station))
-                
+
+        # 把所有站點加上前後站點寫入graph (可以理解成一種linked list)
         for line in response:
             for index, station in enumerate(line["Stations"]):
                 
                 current_station_name: str = station["StationName"]["Zh_tw"]
                 current_station_id: str = station["StationID"]
                 
+                # 初始化graph節點(若在其他線已被加入則不需重複加入)
                 if current_station_name not in self.graph:
                     self.graph[current_station_name] = []
-                    
+
+                # 處理支線
                 if current_station_id.endswith("A"):
                     for station in line["Stations"]:
                         if station["StationID"] == current_station_id[:-1]:
@@ -208,17 +216,19 @@ class MetroSystem:
                                 self.graph[station_name].append(current_station_name)
                     
                 else:
+                    # 如果不是首站
                     if index != 0:
                         station_name = line["Stations"][index - 1]["StationName"]["Zh_tw"]
                         if station_name not in DELETE_STATIONS:
                             self.graph[current_station_name].append(station_name)
-                            
+
+                    # 如果不是末站        
                     if index != len(line["Stations"]) - 1:
                         station_name = line["Stations"][index + 1]["StationName"]["Zh_tw"]
                         if station_name not in DELETE_STATIONS:
                             self.graph[current_station_name].append(station_name)
                 
-        
+        # 去除未被使用的站點
         self.delete_stations()
             
     

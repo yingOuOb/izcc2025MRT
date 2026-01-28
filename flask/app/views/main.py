@@ -2,6 +2,7 @@ import io
 import os
 import logging
 import json
+import zipfile
 from flask import abort, Blueprint, Response, render_template, redirect, send_file, send_from_directory, session
 from zenora import APIClient
 
@@ -120,17 +121,24 @@ def initialization():
 
 
 @main.route("/log")
-def serve_log():
+def server_log():
     log_directory = os.path.join(BASEDIR, "logs")
-    log_filename = "app.log"
+    # log_filename = "app.log"
     
-    if is_game_admin():
-        
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
-        
-        log.info(f"{current_user.username}({current_user.id}) is checking the log file")
-        
-        return send_from_directory(log_directory, log_filename)
+    if not is_game_admin():
+        abort(404)
+
+    bearer_client = APIClient(session.get("token"), bearer=True)
+    current_user = bearer_client.users.get_current_user()
     
-    abort(404)
+    log.info(f"{current_user.username}({current_user.id}) is checking the log file")
+    
+    with zipfile.ZipFile(log_directory + ".zip", 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(log_directory):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, os.path.dirname(log_directory))
+                zipf.write(file_path, arcname)
+
+    return send_file(log_directory + ".zip", as_attachment=True, download_name="logs.zip")
+    # return send_from_directory(log_directory, log_filename)
