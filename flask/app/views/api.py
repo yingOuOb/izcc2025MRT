@@ -87,7 +87,7 @@ def station(name: str):
     if not is_player():
         abort(403)
     
-    station = core.metro.find_station(name.replace("_", "/"))
+    station = core.metro.find_station(name)
     
     if station is None:
         return jsonify({})

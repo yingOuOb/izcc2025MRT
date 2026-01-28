@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     showPointchart();
     // showDistance();
     resizeMap();
-    window.addEventListener('resize', resizeMap);
     window.addEventListener('load', resizeMap);
+    window.addEventListener('click', resizeMap);
+    window.addEventListener('scroll', resizeMap);
 });
-
 
 // repeat
 setInterval(showMap, 10000);
@@ -92,6 +92,7 @@ async function checkImageExists(imageUrl) {
         return false;
     }
 }
+
 async function station_info(station_name) {
     const team = document.querySelector('#team').innerHTML;
     station_name = station_name.replace("/", "_");

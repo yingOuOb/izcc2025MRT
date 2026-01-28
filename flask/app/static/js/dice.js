@@ -449,8 +449,9 @@ async function ChoiceAPI() {
             document.querySelectorAll('.choice-button:not(.disabled)').forEach(button => {
                 button.addEventListener('click', (event) => {
                     let newLocation = event.target.textContent;
+                    
                     Promise.all([
-                        fetch(`/api/move_to_location/${team}/${newLocation}`).then(response => response.text()),
+                        fetch(`/api/move_to_location/${team}/${newLocation.replace("/", "_")}`).then(response => response.text()),
                         fetch(`/api/team/${team}`).then(response => response.json())
                     ])
                         .then(([data, team_data]) => {

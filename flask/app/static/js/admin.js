@@ -103,7 +103,7 @@ function leave_team() {
 
 function set_location() {
     const team = document.getElementById("move_team_team-name").value;
-    const location = document.getElementById("move_location").value;
+    const location = document.getElementById("move_location").value.replace("/", "_");
 
     if (team === "" || location === "") {
         alert("請填入隊伍名稱和位置");
