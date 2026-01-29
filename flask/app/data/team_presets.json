@@ -1,0 +1,38 @@
+{
+    "teams": [
+        {
+            "name": "零小",
+            "players": [],
+            "admins": [],
+            "station": ""
+        },
+
+        {
+            "name": "一小",
+            "players": [],
+            "admins": [],
+            "station": ""
+        },
+
+        {
+            "name": "二小",
+            "players": [],
+            "admins": [],
+            "station": ""
+        },
+
+        {
+            "name": "三小",
+            "players": [],
+            "admins": [],
+            "station": ""
+        },
+        
+        {
+            "name": "四小",
+            "players": [],
+            "admins": [],
+            "station": ""
+        }
+    ]
+}

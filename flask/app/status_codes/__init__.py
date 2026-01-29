@@ -23,6 +23,7 @@ class StatusCodes:
     S20001 = "Team Error"
     S20002 = "Team is imprisoned."
     S20003 = "Team is already exist."
+    S20004 = "Team start location is already defined."
     
     S30001 = "Player Error"
     S30002 = "Player is not in any team."

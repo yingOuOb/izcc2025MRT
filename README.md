@@ -122,18 +122,18 @@
 ### 一般遊戲設定
 
 所有設定皆在
-[game_config.json](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/data/game_config.json)
+[game_config.json](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/data/game_config.json)
 中進行設定，且改變設定後須重新啟動程式以套用設定，
 另外參數說明可在
-[game_config.py](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/game_config.py)
+[game_config.py](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/game_config.py)
 亦或是參數說明文件中獲取更詳細的資訊
 
-- [參數說明文件](https://github.com/lucasw0908/izcc2024MRT/blob/main/assets/Parameter.md)
+- [參數說明文件](https://github.com/yingOuOb/izcc2025MRT/blob/main/assets/Parameter.md)
 
 ### 站點資訊設定
 
 所有設定皆在
-[station_info.json](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/data/station_info.json)
+[station_info.json](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/data/station_info.json)
 中進行設定，且改變設定後須重新啟動程式以套用設定
 
 範例格式如下
@@ -158,7 +158,7 @@
 ### 組合資訊設定
 
 所有設定皆在
-[combo.json](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/data/combo.json)
+[combo.json](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/data/combo.json)
 中進行設定，且改變設定後須重新啟動程式以套用設定
 
 範例格式如下
@@ -184,17 +184,17 @@
 
 若是需要改變前端的呈現，可參考此資料對API進行交互藉此控制遊戲核心
 
-- [API文件](https://github.com/lucasw0908/izcc2024MRT/blob/main/assets/API.md)
+- [API文件](https://github.com/yingOuOb/izcc2025MRT/blob/main/assets/API.md)
 
 文件內說明可能有遺漏或版本不符等問題，最新版本之API說明可參考
 
-- [api.py](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/views/api.py)
-- [admin_api.py](https://github.com/lucasw0908/izcc2024MRT/blob/main/flask/app/views/admin_api.py)
+- [api.py](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/views/api.py)
+- [admin_api.py](https://github.com/yingOuOb/izcc2025MRT/blob/main/flask/app/views/admin_api.py)
 
 ### 紀錄日誌
 
 所有紀錄日誌皆儲存於
-[logs](https://github.com/lucasw0908/izcc2024MRT/tree/main/flask/app/logs)
+[logs](https://github.com/yingOuOb/izcc2025MRT/tree/main/flask/app/logs)
 資料夾內，詳細可參閱資料夾內說明文件
 
 ### 狀態代碼
@@ -203,7 +203,7 @@
 
 如欲新增語言可至以下資料夾內新增對應語言之翻譯文件
 
-- [status codes](https://github.com/lucasw0908/izcc2024MRT/tree/main/flask/app/status_codes)
+- [status codes](https://github.com/yingOuOb/izcc2025MRT/tree/main/flask/app/status_codes)
 
 詳細狀態代碼資訊可參考文件內容，預設為英文文件如下：
 
@@ -225,6 +225,7 @@
     "S20001": "Team Error",
     "S20002": "Team is imprisoned.",
     "S20003": "Team is already exist.",
+    "S20004": "S20004": "Team start location is already defined.",
     
     "S30001": "Player Error",
     "S30002": "Player is not in any team.",
@@ -251,7 +252,7 @@
 
 ### 其他開發者
 
-- [samuelhsieh0829](https://github.com/samuelhsieh0829)：前端GPS定位、伺服器維運、除錯
+- [samuelhsieh0829](https://github.com/samuelhsieh0829)：前端GPS定位、伺服器維運(CD)、除錯、功能優化
 - [FranzLee](https://github.com/FranzLee)：擲骰子介面撰寫
 - [IanWen](https://github.com/IanWen103026)：優化擲骰子介面設計
 

@@ -255,3 +255,11 @@ Returns: `json`, `Invalid Team`, `Invalid Location`, `Team is imprisoned`
 ```
 
 ---
+- `/arrive_target/<name: str>` : Update the current location of the team. Replacement for GPS location.
+
+Returns `Success`, `Invalid Team`, `Mission not finished`, `Invalid Location`
+
+---
+- `/set_station/<name: str>/<station: str>` : Set the starting station of the team. Every team can only use once if it's in `team_presets.json` and without pre-defined starting location.
+
+Returns `Success`, `Invalid Team`, `Already defined`

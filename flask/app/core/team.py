@@ -6,6 +6,7 @@ from ..game_config import START_STATION
 class Team:
     def __init__(self, name: str, players: Optional[list[str]]=None, admins: Optional[list[str]]=None, location: Optional[str]=None) -> None:
         self.name: str = name
+        self.start_location_defined: bool = location is not None
         self.location: str = location or START_STATION
         self.target_location: Optional[str] = location or START_STATION
         self.players = players if players is not None else []

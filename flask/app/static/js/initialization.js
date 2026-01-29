@@ -15,6 +15,15 @@ function team_list() {
             const label = document.getElementById('teammate_list_label');
             const adminsList = document.getElementById('admins_list');
             const playersList = document.getElementById('players_list');
+            const setStation = document.getElementById('set_station');
+
+            // 顯示設定初始站點選項
+            const startStationDefined = data.start_location_defined;
+            if (!startStationDefined) {
+                setStation.style.display = 'block';
+            } else {
+                setStation.style.display = 'none';
+            }
 
             // 清空先前的內容
             adminsList.innerHTML = '';
@@ -51,6 +60,14 @@ function team_list() {
         });
 }
 
+
+function set_station() {
+    const team = document.getElementById('team').textContent;
+    const station = document.getElementById('station_name').value;
+    fetch(`/api/set_station/${team}/${station.replaceAll('/', '_')}`)
+        .then(response => response.text())
+        .then(response => { alert(response); });
+}
 
 function join_team() {
     const team = document.getElementById('team').textContent;

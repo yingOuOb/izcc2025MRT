@@ -443,6 +443,56 @@ def arrive_target(name: str):
         
     return STATUS_CODES.S00000
 
+@api.route("/set_station/<name>/<station>")
+def set_station(name: str, station: str):
+    """
+    Set the starting station of the team.
+
+    Parameters
+    ----------
+    name: :type:`str`
+        The name of the team.
+
+    station: :type:`str`
+        The station to set.
+
+    Returns
+    -------
+    result: :type:`str`
+        The status code.
+
+    Status Codes
+    ------------
+    - S00000: Success
+    - S00004: The team does not exist.
+    - S00006: The location does not exist.
+    - S20004: The team start location is already defined.
+    - S99999: The game is not running.
+    """
+
+    if not is_admin():
+        abort(403)
+
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+
+    if name not in core.teams:
+        return STATUS_CODES.S00004
+
+    station = station.replace("_", "/")
+
+    if core.metro.find_station(station) is None:
+        return STATUS_CODES.S00006
+    
+    if core.teams[name].start_location_defined:
+        return STATUS_CODES.S20004
+
+    core.teams[name].location = station
+    core.teams[name].target_location = station
+    core.teams[name].start_location_defined = True
+
+    return STATUS_CODES.S00000
+
 @api.route("/add_point/<name>/<point>")
 def add_point(name: str, point: int):
     """

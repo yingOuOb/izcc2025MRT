@@ -32,7 +32,13 @@ class Core:
         self.prison_scheduler = BackgroundScheduler()
         self.unknown_players = []
         
+        # 預先建立管理員隊伍
         self.create_team("admins", admins=ADMINS.copy())
+
+        # 建立預設隊伍
+        teams_presets = load_data("team_presets")
+        for team in teams_presets["teams"]:
+            self.create_team(**team)
         
         self.start_game()
         
@@ -256,7 +262,10 @@ class Core:
         if name in self.teams.keys():
             log.warning(f"Team {name} already exists.")
             return None
-            
+        
+        if station == "":
+            station = None
+
         self.teams[name] = Team(name, players if players is not None else [], admins if admins is not None else [], station)
         
         log.debug(f"Team {name} created.")

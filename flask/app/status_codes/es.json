@@ -15,6 +15,7 @@
     "S20001": "Error en el equipo.",
     "S20002": "El equipo está encarcelado.",
     "S20003": "El equipo ya existe.",
+    "S20004": "Se ha definido la posición inicial del equipo.",
     
     "S30001": "Error en el jugador.",
     "S30002": "El jugador no está en ningún equipo.",

@@ -25,6 +25,24 @@
 
 <div class="content">
     <h2>{{team}}</h2>
+    
+    <h2>傳送到起點</h2>
+    <div class="slider-container" id="set_station" style="display: none;">
+        
+        <table class="input-table">
+        <tr>
+            <td>
+                <div class="input-group">
+                    <input required="" type="text" name="text" autocomplete="off" class="input" id="station_name">
+                    <label class="user-label">站名</label>
+                </div>
+            </td>
+            <td>
+                <button type="submit" class="submit-button" onclick="set_station()">確認</button>
+            </td>
+        </tr>
+        </table>
+    </div>
 
     <h2>分數控制</h2>
     <div class="slider-container">
