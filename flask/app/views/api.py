@@ -491,6 +491,9 @@ def set_station(name: str, station: str):
     core.teams[name].target_location = station
     core.teams[name].start_location_defined = True
 
+    core.teams[name].add_point_log(0, f"Set starting station to {station}")
+    log.log(INFO, f"{YELLOW_TEXT_COLOR}{name} set starting station to {station}{RESET_TEXT_COLOR}")
+
     return STATUS_CODES.S00000
 
 @api.route("/add_point/<name>/<point>")

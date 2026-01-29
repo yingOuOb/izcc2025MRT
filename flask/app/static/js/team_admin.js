@@ -11,6 +11,8 @@ function get_pos() {
         .then(response => response.json())
         .then(data => {
            cur_location = data.location;
+           target_location = data.target_location;
+           document.getElementById("target_pos_label").textContent = `目標站點 : ${target_location}`;
            document.getElementById("pos_label").textContent = `目前位置 : ${cur_location}`;
         })
 }
