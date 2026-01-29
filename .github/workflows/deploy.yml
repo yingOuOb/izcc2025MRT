@@ -21,8 +21,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/server/docker/izcc2025MRT
-            echo ${{ secrets.SERVER_USER_PWD }} | sudo -S git pull origin main
-            echo ${{ secrets.SERVER_USER_PWD }} | sudo -S docker build -t mrt2025:latest ./flask
+            echo ${{ secrets.SERVER_USER_PWD }} | sudo -S git pull
+            cd flask
+            echo ${{ secrets.SERVER_USER_PWD }} | sudo -S docker build -t mrt2025:latest .
             echo ${{ secrets.SERVER_USER_PWD }} | sudo -S docker stop mrt2025 || true
             echo ${{ secrets.SERVER_USER_PWD }} | sudo -S docker rm mrt2025 || true
             echo ${{ secrets.SERVER_USER_PWD }} | sudo -S docker run -d --name mrt2025 -p 4011:8080 mrt2025:latest
