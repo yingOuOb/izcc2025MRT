@@ -59,10 +59,10 @@ def create_team(name: str, station: str):
     if name in core.teams:
         return STATUS_CODES.S20003
         
-    if core.metro.find_station(station) is None:
+    if core.metro.find_station(station.replace("_", "/")) is None:
         return STATUS_CODES.S00003
         
-    core.create_team(name=name, station=station)
+    core.create_team(name=name, station=station.replace("_", "/"))
     return STATUS_CODES.S00000
     
     
@@ -134,7 +134,7 @@ def set_location(name: str, location: str):
     if core.teams[name].is_imprisoned:
         return STATUS_CODES.S20002
     
-    core.teams[name].location = location
+    core.teams[name].location = location.replace("_", "/")
     
     return STATUS_CODES.S00000
 
@@ -150,7 +150,7 @@ def set_target_location(name: str, location: str):
     if name not in core.teams:
         return STATUS_CODES.S00004
         
-    core.teams[name].target_location = location
+    core.teams[name].target_location = location.replace("_", "/")
     
     return STATUS_CODES.S00000
 

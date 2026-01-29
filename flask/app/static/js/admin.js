@@ -48,7 +48,7 @@ function create_team() {
         return;
     }
 
-    fetch(`/api/admin/create_team/${team}/${position}`)
+    fetch(`/api/admin/create_team/${team}/${position.replace("/", "_")}`)
         .then(response => response.text())
         .then(response => { alert(response); });
 }
@@ -110,7 +110,7 @@ function set_location() {
         return;
     }
     
-    fetch(`/api/admin/set_location/${team}/${location}`)
+    fetch(`/api/admin/set_location/${team}/${location.replace("/", "_")}`)
         .then(response => response.text())
         .then(response => { alert(response); });
 }

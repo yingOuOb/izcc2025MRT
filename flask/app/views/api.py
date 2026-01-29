@@ -87,7 +87,7 @@ def station(name: str):
     if not is_player():
         abort(403)
     
-    station = core.metro.find_station(name)
+    station = core.metro.find_station(name.replace("_", "/"))
     
     if station is None:
         return jsonify({})
@@ -106,7 +106,7 @@ def station(name: str):
     
     data = station.__dict__.copy()
     log.debug(f"Station: {data}")
-    if station.hidden and (name not in unlock_stations):
+    if station.hidden and (station.name not in unlock_stations):
         data["mission"] = "隱藏"
         data["tips"] = "隱藏"
         data["exit"] = "隱藏"
@@ -385,6 +385,8 @@ def move_to_location(name: str, location: str):
     
     if not core.teams[name].current_mission_finished:
         return STATUS_CODES.S50002
+    
+    location = location.replace("_", "/")
         
     if location not in core.teams[name].choice:
         return STATUS_CODES.S00006

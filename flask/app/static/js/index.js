@@ -95,10 +95,9 @@ async function checkImageExists(imageUrl) {
 
 async function station_info(station_name) {
     const team = document.querySelector('#team').innerHTML;
-    station_name = station_name.replace("/", "_");
 
     const swalInstance = Swal.fire({
-        title: `${station_name.replace("_", "/")} 站點資訊`,
+        title: `${station_name} 站點資訊`,
         html: '<div class="loading-container"><span>載入中</span><div class="chaotic-orbit"></div></div>',
         showConfirmButton: false,
         showCancelButton: false,
@@ -108,11 +107,11 @@ async function station_info(station_name) {
 
     try {
         const [data, team_data] = await Promise.all([
-            fetch(`/api/station/${station_name}`).then(response => response.json()),
+            fetch(`/api/station/${station_name.replace("/", "_")}`).then(response => response.json()),
             fetch(`/api/team/${team}`).then(response => response.json())
         ]);
 
-        const imageUrl = `../static/img/stations/${station_name}.jpg`;
+        const imageUrl = `../static/img/stations/${station_name.replace("/", "_")}.jpg`;
         const exists = await checkImageExists(imageUrl);
         const imageHtml = exists ? `<img src="${imageUrl}" alt="${station_name} 圖片" style="width:60%; height:auto;">` : '';
         const lebel_image = (!data.is_special || station_name === team_data.location) ? imageHtml : "";
@@ -127,8 +126,6 @@ async function station_info(station_name) {
         const label_depiction = data.mission;
         const label_exit = data.exit;
         const lebel_difficult = data.difficult === 1 ? "簡單" : data.difficult === 2 ? "普通" : data.difficult === 3 ? "困難" : null;
-
-        station_name = station_name.replace("_", "/");
 
         const result = await Swal.fire({
             title: `${station_name} 站點資訊`,
