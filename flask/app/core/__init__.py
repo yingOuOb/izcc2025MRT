@@ -710,7 +710,7 @@ class Core:
         
         self.teams[name].point = 10
         self.teams[name].step = 0
-        self.teams[name].target_location = None
+        self.teams[name].target_location = self.teams[name].location
         self.teams[name].current_mission_finished = True
         self.teams[name].current_card = None
         self.teams[name].imprisoned_time = 0
