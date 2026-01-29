@@ -53,7 +53,7 @@
     "collapse": [
         {
             "status": 1,
-            "time": "21:10",
+            "time": "15:00",
             "final": false,
             "stations": [
                 "明德",
@@ -81,7 +81,7 @@
         },
         {
             "status": 2,
-            "time": "21:20",
+            "time": "16:00",
             "final": false,
             "stations": [
                 "劍潭",
@@ -106,7 +106,7 @@
         },
         {
             "status": 3,
-            "time": "21:30",
+            "time": "17:00",
             "final": true,
             "stations": []
         }
