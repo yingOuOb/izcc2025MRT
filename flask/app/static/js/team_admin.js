@@ -142,6 +142,7 @@ function arrive_target() {
                     confirmButtonText: "OK",
                     willClose: () => {
                         mission_label();
+                        get_pos();
                     }
                 });
             }
