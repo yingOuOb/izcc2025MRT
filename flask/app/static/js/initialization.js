@@ -16,13 +16,16 @@ function team_list() {
             const adminsList = document.getElementById('admins_list');
             const playersList = document.getElementById('players_list');
             const setStation = document.getElementById('set_station');
+            const set_station_label = document.getElementById('set_station_label');
 
             // 顯示設定初始站點選項
             const startStationDefined = data.start_location_defined;
             if (!startStationDefined) {
                 setStation.style.display = 'block';
+                set_station_label.style.display = 'block';
             } else {
                 setStation.style.display = 'none';
+                set_station_label.style.display = 'none';
             }
 
             // 清空先前的內容
