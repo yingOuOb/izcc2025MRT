@@ -191,7 +191,11 @@
 </div>
 
 <div class="team_locate">
-    <p id="team0_location_lebel">零小:</p>
+    {% for team in teams %}
+        <p id="team{{loop.index0}}_location_lebel">{{team.name}}:</p>
+        <p id="team{{loop.index0}}_location"></p>
+    {% endfor %}
+    <!-- <p id="team0_location_lebel">零小:</p>
     <p id="team0_location"></p>
     <p id="team1_location_lebel">一小:</p>
     <p id="team1_location"></p>
@@ -200,7 +204,7 @@
     <p id="team3_location_lebel">三小:</p>
     <p id="team3_location"></p>
     <p id="team4_location_lebel">四小:</p>
-    <p id="team4_location"></p>
+    <p id="team4_location"></p> -->
 </div>
 
 <div class="point_is_imprisoned_container">
@@ -210,7 +214,16 @@
 
 <div class="team_point">
     <div class="scoreboard">
-        <div class="team" id="team0" data-score="0">
+        {% for team in teams %}
+            <div class="team" id="team{{loop.index0}}" data-score="0">
+                <span class="team-name" id="team{{loop.index0}}_point_lebel">{{team.name}}</span>
+                <div class="progress-bar">
+                    <div class="progress" id="team{{loop.index0}}-progress"></div>
+                </div>
+                <span class="score">0 分</span>
+            </div>
+        {% endfor %}
+        <!-- <div class="team" id="team0" data-score="0">
             <span class="team-name" id="team0_point_lebel">零小</span>
             <div class="progress-bar">
                 <div class="progress" id="team0-progress"></div>
@@ -244,7 +257,7 @@
                 <div class="progress" id="team4-progress"></div>
             </div>
             <span class="score">0 分</span>
-        </div>
+        </div> -->
     </div>
 </div>
 

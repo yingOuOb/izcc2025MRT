@@ -165,7 +165,7 @@ async function station_info(station_name) {
 }
 
 
-const chineseNumerals = { '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, };
+const chineseNumerals = { '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, };
 
 async function showLocate() {
     try {
@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
 
     function setupEventListeners() {
-        for (let i = 0; i <= 4; i++) {
+        for (let i = 0; i <= 5; i++) {
             document.getElementById(`team${i}_location_lebel`).addEventListener("click", function() {
                 owned_stations_alert(this.textContent);
             });

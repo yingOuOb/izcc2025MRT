@@ -468,10 +468,11 @@ class Core:
             log.warning(f"Team {name} hasn't moved.")
             return None
         
+        
         self.teams[name].location = self.teams[name].target_location
         station = self.metro.find_station(self.teams[name].location)
         
-        
+
         # 達成組合
         self.check_combo(name)
         
@@ -490,8 +491,14 @@ class Core:
             self.teams[name].current_mission_finished = True
             self.teams[name].stations.append(station.name)
             
-            log.debug(f"Team {name} is imprisoned.")
-            
+            log.debug(f"Team {name} is imprisoned.") 
+
+        elif station.name in self.teams[name].owned_stations:
+            self.teams[name].current_mission_finished = True
+            log.debug(f"team {name} arrived at {self.teams[name].location} again.")
+            self.teams[name].add_point_log(0, f"Arrived at {self.teams[name].location} again")
+            return None
+
         else:
             self.teams[name].current_mission_finished = False
             
