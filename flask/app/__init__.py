@@ -36,7 +36,6 @@ def init_logger(debug: bool=False) -> None:
         filename=os.path.join(BASEDIR, "logs", "app.log"),
         encoding="utf-8",
         maxBytes=8**7, 
-        backupCount=8
     )
         
     file_handler.setLevel(logging.DEBUG)
