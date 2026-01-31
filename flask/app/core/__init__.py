@@ -173,6 +173,7 @@ class Core:
                 team.imprisoned_time = 0
                 
                 log.debug(f"Team {team.name} released.")
+                core.teams[team.name].add_event_log(f"Released from prison")
                 self.socketio.emit("release", team.name)
                 
                 
@@ -321,6 +322,7 @@ class Core:
                 self.teams[name].point += combo["point"]
                 self.teams[name].combos.append(combo["name"])
                 self.teams[name].add_point_log(combo["point"], f"Achieved combo {combo['name']}")
+                core.teams[name].add_event_log(f"Achieved combo {combo['name']}")
                 
                 self.socketio.emit("combo", combo["name"])
                 
@@ -443,7 +445,7 @@ class Core:
 
         
         log.debug(f"The target location of team {name} is {location}.")
-        self.teams[name].add_point_log(0, f"Going to {self.teams[name].target_location}")
+        self.teams[name].add_event_log(f"Going to {self.teams[name].target_location}")
         
         return None
 
@@ -490,13 +492,14 @@ class Core:
             self.teams[name].imprisoned_time = random.randint(IMPRISONED_TIME["min"], IMPRISONED_TIME["max"])
             self.teams[name].current_mission_finished = True
             self.teams[name].stations.append(station.name)
-            
+
+            core.teams[name].add_event_log(f"Imprisoned at {station.name}")
             log.debug(f"Team {name} is imprisoned.") 
 
         elif station.name in self.teams[name].owned_stations:
             self.teams[name].current_mission_finished = True
             log.debug(f"team {name} arrived at {self.teams[name].location} again.")
-            self.teams[name].add_point_log(0, f"Arrived at {self.teams[name].location} again")
+            self.teams[name].add_event_log(f"Arrived at {self.teams[name].location} again")
             return None
 
         else:
@@ -506,7 +509,7 @@ class Core:
         # self.metro.find_station(location).hidden = False
         
         log.debug(f"team {name} arrived at {self.teams[name].location}.")
-        self.teams[name].add_point_log(0, f"Arrived at {self.teams[name].location}")
+        self.teams[name].add_event_log(f"Arrived at {self.teams[name].location}")
         
         return None 
         
@@ -555,12 +558,14 @@ class Core:
         # 完成任務加分
         self.teams[name].point += station.point
         self.teams[name].add_point_log(station.point, f"Finish mission at {station.name}")
+        core.teams[name].add_event_log(f"Finished the mission")
         
         # 佔領
         if station.team is None:
             self.metro.find_station(station.name).team = name
             if station.name not in self.teams[name].owned_stations:
                 self.teams[name].owned_stations.append(station.name)
+                self.teams[name].add_event_log(f"Owned station {station.name}")
             
         # 紀錄經過站點
         if station.name not in self.teams[name].stations:
@@ -581,6 +586,7 @@ class Core:
                 card = f"card{self.dice(CARD_COUNT)}"
                 self.teams[name].current_card = card
             
+            core.teams[name].add_event_log(f"Drew card \'{self.teams[name].current_card}\'")
             log.debug(f"Team {name} draw card {self.teams[name].current_card}.")    
             
             return self.teams[name].current_card
@@ -623,6 +629,7 @@ class Core:
         self.teams[name].location = self.teams[name].target_location
         
         log.debug(f"Team {name} skipped the mission.")
+        core.teams[name].add_event_log(f"Skipped the mission")
             
         
     def dice(self, faces: int=6) -> int:

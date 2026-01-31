@@ -369,6 +369,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             document.getElementById(`team${i}_point_lebel`).addEventListener("click", function() {
                 point_log_alert(this.textContent);
             });
+            document.getElementById(`team${i}_location`).addEventListener("click", function() {
+                event_log_alert(teamsData, i);
+            });
         }
     }
     
@@ -408,6 +411,32 @@ document.addEventListener("DOMContentLoaded", async function() {
                 didOpen: () => {
                     const pointLogDiv = document.getElementById('pointLog');
                     pointLogDiv.scrollTo(0, pointLogDiv.scrollHeight);
+                }
+            });
+        } else {
+            Swal.fire({
+                title: `錯誤`,
+                html: `找不到隊伍: ${team_name}`,
+                confirmButtonText: '關閉'
+            });
+        }
+    }
+
+    function event_log_alert(teamsData, teamIndex) {
+        team_name = document.getElementById(`team${teamIndex}_location_lebel`).textContent;
+        team_name = team_name.replace(':', '').trim();
+        const teamData = teamsData.find(t => t.name === team_name);
+        if (teamData) {
+            const event_log = teamData.event_log.length > 0 
+                ? teamData.event_log.map(log => `${log.time} ${log.event}`).join('<br>') 
+                : '無';
+            Swal.fire({
+                title: `${team_name} 路徑/事件紀錄`,
+                html: `<div id="eventLog" style="max-height: 700px ; overflow-y: scroll;">${event_log}</div>`,
+                confirmButtonText: '關閉',
+                didOpen: () => {
+                    const eventLogDiv = document.getElementById('eventLog');
+                    eventLogDiv.scrollTo(0, eventLogDiv.scrollHeight);
                 }
             });
         } else {

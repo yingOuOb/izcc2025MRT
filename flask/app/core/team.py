@@ -12,7 +12,8 @@ class Team:
         self.players = players if players is not None else []
         self.admins = admins if admins is not None else []
         
-        self.point_log: list[dict] = []
+        self.point_log: list[dict] = [] # {"point": int, "reason": str, "time": str}
+        self.event_log: list[dict] = [] # {"event": str, "time": str}
         self.point: int = 10
         self.step: int = 0
         
@@ -43,3 +44,10 @@ class Team:
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.point_log.append(data)
+
+    def add_event_log(self, event: str) -> None:
+        data = {
+            "event": event,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        self.event_log.append(data)
