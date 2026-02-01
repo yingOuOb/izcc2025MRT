@@ -5,7 +5,7 @@ from ..core import core
 
 
 log = logging.getLogger(__name__)
-socketio = SocketIO()
+socketio = SocketIO(async_mode="gevent_uwsgi", async_handlers=False)
 
 
 @socketio.on("Connect")
