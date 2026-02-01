@@ -1,4 +1,4 @@
-FROM python:3.11.6-slim
+FROM python:3.11.6-alpine3.18
 
 WORKDIR /app
 
@@ -9,7 +9,9 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-RUN pip install --no-cache-dir uwsgi
+RUN apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers python3-dev && \
+    pip install uwsgi && \
+    apk del .build-deps
 
 COPY . .
 
