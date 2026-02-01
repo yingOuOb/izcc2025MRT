@@ -5,7 +5,7 @@ from ..core import core
 
 
 log = logging.getLogger(__name__)
-socketio = SocketIO(async_mode="gevent", async_handlers=False, cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*", allow_upgrades=False)
 
 
 @socketio.on("Connect")
