@@ -229,7 +229,7 @@ class Core:
         for team in self.teams.values():
             if team.name == "admins":
                 continue
-            if team.name not in Teams.query.all():
+            if Teams.query.filter_by(name=team.name).first() is None:
                 db.session.add(Teams(team.name, team.players, team.admins, team.point))
             else:
                 Teams.query.filter_by(name=team.name).update({"players": team.players, "admins": team.admins, "point": team.point})

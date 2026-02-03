@@ -89,7 +89,7 @@ def create_app() -> Flask:
     csrf = CSRFProtect(app)
     CORS(app)
     app_load_blueprints(app)
-    db.__init__(app)
+    db.init_app(app)
     socketio.init_app(app, cors_allowed_origins="*")
     core.init_socketio(socketio)
     with app.app_context(): db.create_all()
