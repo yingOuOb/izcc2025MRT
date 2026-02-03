@@ -241,8 +241,59 @@ def finish_mission(name: str):
     return STATUS_CODES.S00000 if card is None else card
 
 
-@admin_api.route("/save_team")
-def save_team():
+# @admin_api.route("/save_team")
+# def save_team():
+#     """
+#     Save the team to the database.
+    
+#     Returns
+#     -------
+#     result: :type:`str`
+#         The status code.
+        
+#     Status Code
+#     -----------
+#     - S00000: The teams are saved successfully.
+#     """
+    
+#     if not is_game_admin():
+#         abort(403)
+        
+#     db.create_all()
+        
+#     core.save_team()
+    
+#     return STATUS_CODES.S00000
+
+
+# @admin_api.route("/load_team")
+# def load_team():
+#     """
+#     Load the team from the database.
+    
+#     Returns
+#     -------
+#     result: :type:`str`
+#         The status code.
+        
+#     Status Code
+#     -----------
+#     - S00000: The teams are loaded successfully.
+#     """
+    
+#     if not is_game_admin():
+#         abort(403)
+        
+#     db.create_all()
+        
+#     core.load_team()
+    
+    
+#     return STATUS_CODES.S00000
+
+
+@admin_api.route("/save_game")
+def save_game():
     """
     Save the team to the database.
     
@@ -253,7 +304,7 @@ def save_team():
         
     Status Code
     -----------
-    - S00000: The game is ended successfully.
+    - S00000: The game is saved successfully.
     """
     
     if not is_game_admin():
@@ -262,12 +313,13 @@ def save_team():
     db.create_all()
         
     core.save_team()
+    core.metro.save_stations()
     
     return STATUS_CODES.S00000
 
 
-@admin_api.route("/load_team")
-def load_team():
+@admin_api.route("/load_game")
+def load_game():
     """
     Load the team from the database.
     
@@ -278,7 +330,7 @@ def load_team():
         
     Status Code
     -----------
-    - S00000: The game is ended successfully.
+    - S00000: The game is loaded successfully.
     """
     
     if not is_game_admin():
@@ -287,6 +339,7 @@ def load_team():
     db.create_all()
         
     core.load_team()
+    core.metro.load_stations()
     
     return STATUS_CODES.S00000
 

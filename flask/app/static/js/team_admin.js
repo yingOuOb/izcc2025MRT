@@ -119,7 +119,16 @@ function missionAPI() {
         .then(response => response.json())
         .then(data => {
             if (data.current_mission_finished) {
-                window.location.href = "/dice";
+                if (data.location !== data.target_location) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "請先抵達目標站點",
+                        text: "Please arrive at the target station first.",
+                        confirmButtonText: "Close"
+                    });
+                } else {
+                    window.location.href = "/dice";
+                }
             }
             else {
                 Swal.fire({

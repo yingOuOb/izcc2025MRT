@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class Core:
     def __init__(self) -> None:
         self.is_running = False
-        self.metro = MetroSystem()
+        # self.metro = MetroSystem() 改到start_game，讓隱藏站和占領狀態可被重置
         self.socketio = None
         self.teams: dict[str, Team] = {}
         self.visited = []
@@ -33,7 +33,7 @@ class Core:
         self.unknown_players = []
         
         # 預先建立管理員隊伍
-        self.create_team("admins", admins=ADMINS.copy())
+        # self.create_team("admins", admins=ADMINS.copy())
 
         # 建立預設隊伍
         teams_presets = load_data("team_presets")
@@ -144,8 +144,7 @@ class Core:
                 team.point -= COLLAPSE_DAMAGE
                 team.add_point_log(-COLLAPSE_DAMAGE, "Station collapsed")
                 self.socketio.emit("collapse_damage", team.name)
-                
-        log.info(f"Station collapsed, all teams in the station will be damaged.")
+                log.debug(f"Team {team.name} took collapse damage.")
                 
                 
     def _collapse_warning(self) -> None:
@@ -184,6 +183,8 @@ class Core:
             log.warning("Game already started.")
             return None
         
+        self.metro = MetroSystem()
+        
         self.init_collapse()
         self.init_prison()
         
@@ -193,8 +194,8 @@ class Core:
         for team in self.teams.values():
             self.reset_team(team.name)
             
-        if "admins" not in self.teams.keys():
-            self.create_team("admins", admins=ADMINS.copy())
+        # if "admins" not in self.teams.keys():
+        #     self.create_team("admins", admins=ADMINS.copy())
             
         self.is_running = True
         
@@ -217,8 +218,18 @@ class Core:
         """Load the data from the database."""
         
         for team in Teams.query.all():
+
             team: Teams
-            self.create_team(team.name, team.players, team.admins)
+
+            if team.name in self.teams:
+                self.teams[team.name].replace_data(team)
+                log.info(f"Loaded team {team.name} from database.")
+            else:
+                self.create_team(team.name, team.players, team.admins, team.location)
+                self.teams[team.name].replace_data(team)
+
+                log.info(f"Created team {team.name} from database.")
+
             
         log.debug("Load data from the database.")
             
@@ -230,9 +241,9 @@ class Core:
             if team.name == "admins":
                 continue
             if Teams.query.filter_by(name=team.name).first() is None:
-                db.session.add(Teams(team.name, team.players, team.admins, team.point))
+                db.session.add(Teams(team))
             else:
-                Teams.query.filter_by(name=team.name).update({"players": team.players, "admins": team.admins, "point": team.point})
+                Teams.query.filter_by(name=team.name).update({**team.__dict__})
                 
         db.session.commit()
         

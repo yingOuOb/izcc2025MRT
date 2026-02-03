@@ -8,6 +8,8 @@ from typing import Any
 from ..config import BASEDIR
 from ..game_config import DELETE_STATIONS, IS_SPECIAL, IS_HIDDEN, API_URL_TP, API_URL_NTP, LOCATION_API_URL_TP, LOCATION_API_URL_NTP, STATION_POINTS
 from ..data import load_data
+from ..models import db
+from ..models.stations import Stations
 
 
 log = logging.getLogger(__name__)
@@ -278,3 +280,34 @@ class MetroSystem:
             for station_name in self.graph[current_station_name]:
                 if station_name in DELETE_STATIONS:
                     self.graph[station_name].remove(station_name)
+
+    def save_stations(self):
+        """Save stations to the database."""
+        for station in self.graph:
+            station_obj = self.find_station(station)
+            if station_obj:
+                db_station = Stations.query.filter_by(name=station_obj.name).first()
+                if db_station is None:
+                    db_station = Stations(
+                        name=station_obj.name,
+                        is_special=station_obj.is_special,
+                        hidden=station_obj.hidden,
+                        owner_team=station_obj.team
+                    )
+                    db.session.add(db_station)
+                else:
+                    Stations.query.filter_by(name=station_obj.name).update({"is_special": station_obj.is_special, "hidden": station_obj.hidden, "owner_team": station_obj.team})
+        
+        db.session.commit()
+
+    def load_stations(self):
+        """Load stations from the database."""
+        for station in Stations.query.all():
+            station_obj = self.find_station(station.name)
+
+            if not station_obj:
+                continue
+
+            station_obj.team = station.owner_team
+            station_obj.hidden = station.hidden
+            station_obj.is_special = station.is_special

@@ -51,3 +51,27 @@ class Team:
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.event_log.append(data)
+
+    def replace_data(self, team: "Team") -> None:
+        self.name: str = team.name
+        self.start_location_defined: bool = team.start_location_defined
+        self.location: str = team.location
+        self.target_location: Optional[str] = team.target_location
+        self.players = team.players
+        self.admins = team.admins
+        
+        self.point_log: list[dict] = team.point_log
+        self.event_log: list[dict] = team.event_log
+        self.point: int = team.point
+        self.step: int = team.step
+        
+        self.current_mission_finished: bool = team.current_mission_finished 
+        self.current_card: Optional[str] = team.current_card
+        
+        self.imprisoned_time: int = team.imprisoned_time
+        self.is_imprisoned: bool = team.is_imprisoned
+        
+        self.stations: list[str] = team.stations
+        self.owned_stations: list[str] = team.owned_stations
+        self.combos: list[str] = team.combos
+        self.choice: list[str] = team.choice

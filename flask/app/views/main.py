@@ -30,6 +30,8 @@ def index():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
+        if team is None and is_game_admin():
+            team = "Game Admins"
         teams = [team for team in core.teams.values() if team.name != "admins"]
         return render_template("index.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url, teams=teams)
     
@@ -42,6 +44,9 @@ def admin():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, is_admin = core.check_player(current_user.username)
+
+        if team is None and is_game_admin():
+            team = "Game Admins"
     
         if is_admin:
             return render_template("admin.html", current_user=current_user.username, team=team)
@@ -64,6 +69,10 @@ def combo():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
+
+        if team is None and is_game_admin():
+            team = "Game Admins"
+
         return render_template("combo.html", current_user=current_user.username, team=team, graph=core.metro.graph, combos=load_data("combo"), avater_url=current_user.avatar_url)
     
     return redirect("/")
@@ -76,6 +85,9 @@ def team_admin():
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
         
+        if team is None and is_game_admin():
+            team = "Game Admins"
+
         if is_admin():
             return render_template("team_admin.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url)
         
@@ -88,6 +100,9 @@ def card():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
+
+        if team is None and is_game_admin():
+            team = "Game Admins"
         
         if is_admin():
             return render_template("card.html", current_user=current_user.username, team=team, graph=core.metro.graph)
@@ -101,6 +116,9 @@ def dice():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
+
+        if team is None and is_game_admin():
+            team = "Game Admins"
         
         if is_admin():
             return render_template("dice.html", current_user=current_user.username, team=team, graph=core.metro.graph)
@@ -114,6 +132,9 @@ def initialization():
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
+
+        if team is None and is_game_admin():
+            team = "Game Admins"
         
         if is_admin():
             return render_template("initialization.html", current_user=current_user.username, team=team, graph=core.metro.graph)

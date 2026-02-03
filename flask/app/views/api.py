@@ -314,6 +314,7 @@ def move(name: str):
     ------------
     - S00004: The team does not exist.
     - S20002: The team is imprisoned.
+    - S40002: The team is not at the target location.
     - S50002: The current mission is not finished.
     - S99999: The game is not running.
     """
@@ -332,6 +333,9 @@ def move(name: str):
     
     if not core.teams[name].current_mission_finished:
         return STATUS_CODES.S50002
+    
+    if core.teams[name].target_location != core.teams[name].location:
+        return STATUS_CODES.S40002
     
     if core.teams[name].step == 0:
         core.teams[name].step = core.dice()
