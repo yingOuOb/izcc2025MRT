@@ -180,7 +180,15 @@ async function showLocate() {
             if (teamNumber !== undefined) {
                 const locationElement = document.getElementById(`team${teamNumber}_location`);
                 if (locationElement) {
-                    locationElement.textContent = team.is_imprisoned ? `監獄⛓️` : `${team.location}`;
+                    if (team.is_imprisoned) {
+                        locationElement.textContent = `監獄⛓️`;
+                    } else {
+                        if (team.location === team.target_location && team.target_location !== null) {
+                            locationElement.textContent = `${team.location}`;
+                        } else {
+                            locationElement.textContent = `${team.location} -> ${team.target_location}`;
+                        }
+                    }
                 }
             }
         });

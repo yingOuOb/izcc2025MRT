@@ -30,6 +30,9 @@ class Config(object):
 class ProdConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI
+    if SQLALCHEMY_DATABASE_URI is None:
+        print("Warning: SQLALCHEMY_DATABASE_URI is not set, using sqlite database instead.")
+        SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(BASEDIR, "db.sqlite3")
 
 
 class DevConfig(Config):

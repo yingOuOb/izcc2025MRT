@@ -30,6 +30,9 @@ class Core:
         self.collapse_list = COLLAPSE_LIST.copy()
         self.collapse_scheduler = BackgroundScheduler()
         self.prison_scheduler = BackgroundScheduler()
+
+        self.backup_scheduler = BackgroundScheduler()
+
         self.unknown_players = []
         
         # 預先建立管理員隊伍
@@ -175,6 +178,16 @@ class Core:
                 core.teams[team.name].add_event_log(f"Released from prison")
                 self.socketio.emit("release", team.name)
                 
+    def init_backup(self) -> None:
+        """Initialize the backup scheduler."""
+        
+        if self.backup_scheduler.running:
+            return None
+        
+        self.backup_scheduler.add_job(self.backup, "interval", minutes=10)
+        self.backup_scheduler.start()
+        
+        log.info("Backup scheduler started.")
                 
     def start_game(self) -> None:
         """Start the game."""
@@ -187,6 +200,7 @@ class Core:
         
         self.init_collapse()
         self.init_prison()
+        self.init_backup()
         
         self.collapse = Collapse()
         self.collapse_list = COLLAPSE_LIST.copy()
@@ -746,6 +760,23 @@ class Core:
         self.teams[name].point_log = []
         
         log.debug(f"Team {name} reset.")
-    
+
+
+    def backup(self) -> None:
+        """Backup the data to the database."""
+        
+        self.save_team()
+        self.metro.save_stations()        
+        
+        log.debug("Backup data to the database.")
+
+    def restore(self) -> None:
+        """Restore the data from the database."""
+        
+        self.load_team()
+        self.metro.load_stations()
+        
+        log.debug("Restore data from the database.")
+
     
 core = Core()

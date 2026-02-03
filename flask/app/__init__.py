@@ -85,7 +85,7 @@ def create_app() -> Flask:
     """
     init_logger(debug=True)
     app = Flask(__name__)
-    app.config.from_object(DevConfig)
+    app.config.from_object(ProdConfig if os.getenv("PRODUCTION", "False").lower() in ("true", "1", "t") else DevConfig)
     csrf = CSRFProtect(app)
     CORS(app)
     app_load_blueprints(app)

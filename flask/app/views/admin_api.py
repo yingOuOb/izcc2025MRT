@@ -312,8 +312,7 @@ def save_game():
         
     db.create_all()
         
-    core.save_team()
-    core.metro.save_stations()
+    core.backup()
     
     return STATUS_CODES.S00000
 
@@ -338,8 +337,7 @@ def load_game():
         
     db.create_all()
         
-    core.load_team()
-    core.metro.load_stations()
+    core.restore()
     
     return STATUS_CODES.S00000
 
