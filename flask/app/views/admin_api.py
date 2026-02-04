@@ -435,11 +435,11 @@ def save_game_auto():
     - S00000: The game is saved successfully.
     """
     
-    request_data = request.get_json()
-    if request_data is None or "secret" not in request_data:
+    request_data = request.headers.get("secret")
+    if request_data is None:
         abort(403)
 
-    if request_data["secret"] != core.auto_backup_secret:
+    if request_data != str(core.auto_backup_secret):
         abort(403)
         
     db.create_all()

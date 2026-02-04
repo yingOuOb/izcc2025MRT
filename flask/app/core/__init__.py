@@ -33,7 +33,7 @@ class Core:
         self.prison_scheduler = BackgroundScheduler()
 
         self.backup_scheduler = BackgroundScheduler()
-        self.auto_backup_secret = random.random()
+        self.auto_backup_secret = str(random.random())
 
         self.unknown_players = []
         
@@ -187,7 +187,7 @@ class Core:
         if self.backup_scheduler.running:
             return None
         
-        self.backup_scheduler.add_job(lambda: requests.post("http://localhost:8080/api/admin/save_game_auto", json={"secret": self.auto_backup_secret}), "interval", minutes=3)
+        self.backup_scheduler.add_job(lambda: requests.post("http://localhost:8080/api/admin/save_game_auto", headers={"secret": str(self.auto_backup_secret)}), "interval", minutes=3)
         self.backup_scheduler.start()
         
         log.info("Backup scheduler started.")
