@@ -4,7 +4,7 @@ WORKDIR /app
 ENV TZ=Asia/Taipei
 
 # 先裝系統 uwsgi + python3 plugin（已編譯好）
-RUN apk add --no-cache uwsgi uwsgi-python3 uwsgi-http
+RUN apk add --no-cache uwsgi uwsgi-python3
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
