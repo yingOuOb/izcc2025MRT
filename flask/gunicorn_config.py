@@ -6,14 +6,14 @@ bind = "0.0.0.0:8080"
 backlog = 2048
 
 # Worker processes
-workers = 1
+workers = 2
 worker_class = "gevent"
 worker_connections = 1000
 timeout = 120
 keepalive = 5
 
 # Threading
-threads = 1
+threads = 8
 
 # Logging
 accesslog = "-"

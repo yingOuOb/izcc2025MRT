@@ -100,7 +100,9 @@ def create_app() -> Flask:
     CORS(app)
     app_load_blueprints(app)
     db.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
+    # Use gevent in production (Docker), threading in development
+    async_mode = 'gevent' if os.getenv("PRODUCTION", "False").lower() in ("true", "1", "t") else 'threading'
+    socketio.init_app(app, cors_allowed_origins="*", async_mode=async_mode)
     core.init_socketio(socketio)
     with app.app_context(): db.create_all()
     
