@@ -49,13 +49,13 @@
         "max": 25
     },
     "backup_interval": 3,
-    "collapse_damage_interval": 1,
+    "collapse_damage_interval": 10,
     "collapse_damage": 25,
     "collapse_list": [],
     "collapse": [
         {
             "status": 1,
-            "time": "00:19",
+            "time": "15:00",
             "final": false,
             "stations": [
                 "明德",
@@ -83,7 +83,7 @@
         },
         {
             "status": 2,
-            "time": "00:21",
+            "time": "16:00",
             "final": false,
             "stations": [
                 "劍潭",
@@ -108,7 +108,7 @@
         },
         {
             "status": 3,
-            "time": "00:23",
+            "time": "17:00",
             "final": true,
             "stations": []
         }
