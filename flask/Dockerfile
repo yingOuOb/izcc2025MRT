@@ -9,13 +9,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-RUN apk add --no-cache --virtual .build-deps cmake libc-dev linux-headers python3-dev && \
-    pip install uwsgi && \
-    apk del .build-deps
-
 COPY . .
 
 EXPOSE 8080
 
-CMD ["uwsgi", "--ini", "uwsgi.ini"]
-# CMD ["python", "main.py"]
+CMD ["gunicorn", "-c", "gunicorn_config.py", "main:app"]

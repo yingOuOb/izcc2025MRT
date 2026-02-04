@@ -10,5 +10,6 @@ Flask-WTF==1.2.1
 pygeohash==1.2.0
 python-dotenv>=1.0.0
 Zenora>=0.0.3.post1
+gunicorn
 gevent
 gevent-websocket

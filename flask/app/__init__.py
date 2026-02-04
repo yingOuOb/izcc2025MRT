@@ -100,7 +100,7 @@ def create_app() -> Flask:
     CORS(app)
     app_load_blueprints(app)
     db.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
     core.init_socketio(socketio)
     with app.app_context(): db.create_all()
     
