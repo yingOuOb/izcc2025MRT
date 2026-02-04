@@ -187,10 +187,11 @@ class Core:
         if self.backup_scheduler.running:
             return None
         
-        self.backup_scheduler.add_job(lambda: requests.post("http://localhost:8080/api/admin/save_game_auto", headers={"secret": str(self.auto_backup_secret)}), "interval", minutes=3)
+        self.backup_scheduler.add_job(lambda: requests.get(f"http://localhost:8080/api/admin/save_game_auto?secret={self.auto_backup_secret}"), "interval", minutes=1)
         self.backup_scheduler.start()
         
         log.info("Backup scheduler started.")
+
                 
     def start_game(self) -> None:
         """Start the game."""

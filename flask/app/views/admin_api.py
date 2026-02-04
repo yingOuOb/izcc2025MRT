@@ -18,7 +18,7 @@ reset_text_color = "\33[0m"
 
 @admin_api.before_request
 def log_user():
-    
+
     if request.endpoint == "admin_api.save_game_auto":
         return
     
@@ -424,10 +424,11 @@ def start_game():
     return STATUS_CODES.S00000
 
 
-@admin_api.route("/save_game_auto", methods=["POST"])
+@admin_api.route("/save_game_auto", methods=["GET"])
 def save_game_auto():
     """
-    Save the team to the database. For auto backup.
+    Save the game automatically. This api is used by the backup scheduler. \\
+    The backup scheduler will send a request to this api every 3 minutes to save the game.
     
     Returns
     -------
@@ -437,15 +438,17 @@ def save_game_auto():
     Status Code
     -----------
     - S00000: The game is saved successfully.
+    - S99999: The game is not running.
     """
     
-    request_data = request.headers.get("secret")
-    if request_data is None:
-        abort(403)
-
-    if request_data != str(core.auto_backup_secret):
+    if request.args.get("secret") != str(core.auto_backup_secret):
         abort(403)
         
+    if core.is_running is False:
+        return STATUS_CODES.S99999
+        
+    log.debug("Auto backup triggered.")
+
     db.create_all()
         
     core.backup()
