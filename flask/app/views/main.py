@@ -10,6 +10,7 @@ from ..core import core
 from ..data import load_data
 from ..config import BASEDIR
 from ..modules.checker import is_game_admin, is_admin
+from ..game_config import GAME_ADMIN_TEAM_NAME
 
 
 log = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ def index():
         current_user = bearer_client.users.get_current_user()
         team, _ = core.check_player(current_user.username)
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
         teams = [team for team in core.teams.values() if team.name != "admins"]
         return render_template("index.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url, teams=teams)
     
@@ -46,7 +47,7 @@ def admin():
         team, is_admin = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
     
         if is_admin:
             return render_template("admin.html", current_user=current_user.username, team=team)
@@ -71,7 +72,7 @@ def combo():
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
 
         return render_template("combo.html", current_user=current_user.username, team=team, graph=core.metro.graph, combos=load_data("combo"), avater_url=current_user.avatar_url)
     
@@ -86,7 +87,7 @@ def team_admin():
         team, _ = core.check_player(current_user.username)
         
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
 
         if is_admin():
             return render_template("team_admin.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url)
@@ -102,7 +103,7 @@ def card():
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
         
         if is_admin():
             return render_template("card.html", current_user=current_user.username, team=team, graph=core.metro.graph)
@@ -118,7 +119,7 @@ def dice():
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
         
         if is_admin():
             return render_template("dice.html", current_user=current_user.username, team=team, graph=core.metro.graph)
@@ -134,7 +135,7 @@ def initialization():
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
-            team = "Game Admins"
+            team = GAME_ADMIN_TEAM_NAME
         
         if is_admin():
             return render_template("initialization.html", current_user=current_user.username, team=team, graph=core.metro.graph)

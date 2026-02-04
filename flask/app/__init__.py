@@ -47,6 +47,16 @@ def init_logger(debug: bool=False) -> None:
     console_handler.setFormatter(formatter)
     logging.getLogger().addHandler(console_handler)
     
+    error_handler = logging.handlers.RotatingFileHandler(
+        filename=os.path.join(BASEDIR, "logs", "error.log"),
+        encoding="utf-8",
+        maxBytes=8**7, 
+    )
+        
+    error_handler.setLevel(logging.WARNING)
+    error_handler.setFormatter(formatter)
+    logging.getLogger().addHandler(error_handler)
+
     #logging.getLogger().addHandler(default_handler)
     
 def app_load_blueprints(app: Flask) -> None:

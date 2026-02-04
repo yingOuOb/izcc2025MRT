@@ -9,6 +9,9 @@ LANGUAGE: str = GAME_CONFIG.get("language", "en")
 ADMINS: list[str] = GAME_CONFIG.get("admins", [])
 """The list of admin's discord username."""
 
+GAME_ADMIN_TEAM_NAME: str = GAME_CONFIG.get("game_admin_team_name", "Game Admins")
+"""The name of the game admin team."""
+
 CARD_COUNT: int = GAME_CONFIG.get("card_count")
 """The number of card in the game."""
 

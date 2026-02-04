@@ -35,7 +35,7 @@ class Teams(db.Model):
 
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     
-    def __init__(self, team:Team) -> None:
+    def __init__(self, team: Team) -> None:
         self.name: str = team.name
         self.start_location_defined: bool = team.start_location_defined
         self.location: str = team.location
