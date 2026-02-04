@@ -42,6 +42,10 @@ IMPRISONED_TIME: dict[str, int] = GAME_CONFIG.get("imprisoned_time", {"min": 5, 
 `min` (:type:`int`): The minimum time (minute) of being imprisoned. Default is 5.\\
 `max` (:type:`int`): The maximum time (minute) of being imprisoned. Default is 20.\\
 """
+
+BACKUP_INTERVAL: int = GAME_CONFIG.get("backup_interval", 3)
+"""The interval of auto backup in minute. Default is 3."""
+
 COLLAPSE: list[dict] = GAME_CONFIG.get("collapse", [])
 """The collapse setting of the game.
 

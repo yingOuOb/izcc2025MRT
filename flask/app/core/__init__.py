@@ -7,7 +7,7 @@ import pygeohash as pgh
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_socketio import SocketIO
 
-from ..game_config import ADMINS, CARD_COUNT, COLLAPSE, COLLAPSE_DAMAGE_INTERVAL, COLLAPSE_DAMAGE, COLLAPSE_LIST, END_STATION, DISTANCE, IMPRISONED_TIME
+from ..game_config import ADMINS, CARD_COUNT, COLLAPSE, COLLAPSE_DAMAGE_INTERVAL, COLLAPSE_DAMAGE, COLLAPSE_LIST, END_STATION, DISTANCE, IMPRISONED_TIME, BACKUP_INTERVAL
 from ..data import load_data
 from ..models import db
 from ..models.teams import Teams
@@ -187,7 +187,7 @@ class Core:
         if self.backup_scheduler.running:
             return None
         
-        self.backup_scheduler.add_job(lambda: requests.get(f"http://localhost:8080/api/admin/save_game_auto?secret={self.auto_backup_secret}"), "interval", minutes=1)
+        self.backup_scheduler.add_job(lambda: requests.get(f"http://localhost:8080/api/admin/save_game_auto?secret={self.auto_backup_secret}"), "interval", minutes=BACKUP_INTERVAL)
         self.backup_scheduler.start()
         
         log.info("Backup scheduler started.")

@@ -10,7 +10,7 @@
         "mlgnotcool",
         "0catea0"
     ],
-    "game_admin_team_name": "Game Admins",
+    "game_admin_team_name": "管管",
     "card_count": 25,
     "station_points": {
         "1": 20,
@@ -48,7 +48,8 @@
         "min": 15,
         "max": 25
     },
-    "collapse_damage_interval": 3,
+    "backup_interval": 3,
+    "collapse_damage_interval": 10,
     "collapse_damage": 25,
     "collapse_list": [],
     "collapse": [
