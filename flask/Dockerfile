@@ -9,8 +9,7 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/ftp.jaist.ac.jp/g' /etc/apk/repositories && \
-    apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers python3-dev && \
+RUN apk add --no-cache --virtual .build-deps cmake libc-dev linux-headers python3-dev && \
     pip install uwsgi && \
     apk del .build-deps
 
