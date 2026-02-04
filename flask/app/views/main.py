@@ -92,7 +92,7 @@ def team_admin():
         if is_admin():
             return render_template("team_admin.html", current_user=current_user.username, team=team, graph=core.metro.graph, avater_url=current_user.avatar_url)
         
-    return redirect("/")
+    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 
 @main.route("/card")

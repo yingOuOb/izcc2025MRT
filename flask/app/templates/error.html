@@ -3,6 +3,7 @@
     <head>
         <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon.png')}}">
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/error.css')}}">
+        <script src="{{url_for('static', filename='js/error.js')}}"></script>
     </head>
 
     <body>
@@ -17,5 +18,6 @@
             <span>{{e}}</span>
             {% endfor %}
         </section>
+        <button id="rick" onclick="rick()">Go Back</button>
     </body>
 </html>
