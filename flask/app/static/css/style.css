@@ -133,14 +133,16 @@ h1 {
 
 .team_locate p {
     margin-right: 2%;
-    font-size: 200%
+    font-size: 200%;
 }
 
 #team0_location,
 #team1_location,
 #team2_location,
-#team3_location {
-    margin-right: 5%;
+#team3_location,
+#team4_location {
+    margin-right: 67%;
+    /* 換行用，之後找更好的方案改動 */
     /* 調整段落元素之間的間距 */
 }
 
