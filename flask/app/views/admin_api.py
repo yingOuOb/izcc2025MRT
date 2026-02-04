@@ -18,6 +18,10 @@ reset_text_color = "\33[0m"
 
 @admin_api.before_request
 def log_user():
+    
+    if request.endpoint == "admin_api.save_game_auto":
+        return
+    
     if "token" in session:
         bearer_client = APIClient(session.get("token"), bearer=True)
         current_user = bearer_client.users.get_current_user()
