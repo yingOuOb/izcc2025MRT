@@ -418,3 +418,32 @@ def start_game():
     core.start_game()
     
     return STATUS_CODES.S00000
+
+
+@admin_api.route("/save_game_auto", methods=["POST"])
+def save_game_auto():
+    """
+    Save the team to the database. For auto backup.
+    
+    Returns
+    -------
+    result: :type:`str`
+        The status code.
+        
+    Status Code
+    -----------
+    - S00000: The game is saved successfully.
+    """
+    
+    request_data = request.get_json()
+    if request_data is None or "secret" not in request_data:
+        abort(403)
+
+    if request_data["secret"] != core.auto_backup_secret:
+        abort(403)
+        
+    db.create_all()
+        
+    core.backup()
+    
+    return STATUS_CODES.S00000

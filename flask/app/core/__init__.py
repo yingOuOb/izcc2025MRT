@@ -1,5 +1,6 @@
 import logging
 import random
+import requests
 from datetime import datetime, timedelta
 
 import pygeohash as pgh
@@ -32,6 +33,7 @@ class Core:
         self.prison_scheduler = BackgroundScheduler()
 
         self.backup_scheduler = BackgroundScheduler()
+        self.auto_backup_secret = random.random()
 
         self.unknown_players = []
         
@@ -144,10 +146,11 @@ class Core:
         
         for team in self.teams.values():
             if team.location in self.collapse_list:
+                log.debug(f"Team {team.name} is in collapsed station {team.location}.")
                 team.point -= COLLAPSE_DAMAGE
                 team.add_point_log(-COLLAPSE_DAMAGE, "Station collapsed")
                 self.socketio.emit("collapse_damage", team.name)
-                log.debug(f"Team {team.name} took collapse damage.")
+                log.debug(f"Team {team.name} took collapse damage -{COLLAPSE_DAMAGE}. Current point: {team.point}.")
                 
                 
     def _collapse_warning(self) -> None:
@@ -184,7 +187,7 @@ class Core:
         if self.backup_scheduler.running:
             return None
         
-        self.backup_scheduler.add_job(self.backup, "interval", minutes=10)
+        self.backup_scheduler.add_job(lambda: requests.post("http://localhost:8080/api/admin/save_game_auto", json={"secret": self.auto_backup_secret}), "interval", minutes=3)
         self.backup_scheduler.start()
         
         log.info("Backup scheduler started.")
@@ -759,7 +762,7 @@ class Core:
         self.teams[name].choice = []
         self.teams[name].point_log = []
         
-        log.debug(f"Team {name} reset.")
+        log.info(f"Team {name} reset.")
 
 
     def backup(self) -> None:
@@ -768,7 +771,7 @@ class Core:
         self.save_team()
         self.metro.save_stations()        
         
-        log.debug("Backup data to the database.")
+        log.info("Backup data to the database.")
 
     def restore(self) -> None:
         """Restore the data from the database."""
@@ -776,7 +779,7 @@ class Core:
         self.load_team()
         self.metro.load_stations()
         
-        log.debug("Restore data from the database.")
+        log.info("Restore data from the database.")
 
     
 core = Core()
