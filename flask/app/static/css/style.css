@@ -141,8 +141,7 @@ h1 {
 #team2_location,
 #team3_location,
 #team4_location {
-    margin-right: 67%;
-    /* 換行用，之後找更好的方案改動 */
+    margin-right: 2%;
     /* 調整段落元素之間的間距 */
 }
 
