@@ -279,7 +279,7 @@ class MetroSystem:
         for current_station_name in self.graph:
             for station_name in self.graph[current_station_name]:
                 if station_name in DELETE_STATIONS:
-                    self.graph[station_name].remove(station_name)
+                    self.graph[current_station_name].remove(station_name)
 
     def save_stations(self):
         """Save stations to the database."""
