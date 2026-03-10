@@ -10,6 +10,7 @@ from ..core import core
 from ..data import load_data
 from ..config import BASEDIR
 from ..modules.checker import is_game_admin, is_admin
+from ..modules.auth import get_current_user
 from ..game_config import GAME_ADMIN_TEAM_NAME
 
 
@@ -27,9 +28,8 @@ def checking(response: Response):
 
 @main.route("/")
 def index():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
         if team is None and is_game_admin():
             team = GAME_ADMIN_TEAM_NAME
@@ -41,15 +41,14 @@ def index():
 
 @main.route("/admin")
 def admin():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
-        team, is_admin = core.check_player(current_user.username)
+    current_user = get_current_user()
+    if current_user is not None:
+        team, is_adm = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
             team = GAME_ADMIN_TEAM_NAME
     
-        if is_admin:
+        if is_adm:
             return render_template("admin.html", current_user=current_user.username, team=team)
         
     return redirect("/")
@@ -66,9 +65,8 @@ def download_graph():
 
 @main.route("/combo")
 def combo():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
@@ -81,9 +79,8 @@ def combo():
 
 @main.route("/team_admin")
 def team_admin():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
         
         if team is None and is_game_admin():
@@ -97,9 +94,8 @@ def team_admin():
 
 @main.route("/card")
 def card():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
@@ -113,9 +109,8 @@ def card():
 
 @main.route("/dice")
 def dice():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
@@ -129,9 +124,8 @@ def dice():
 
 @main.route("/initialization")
 def initialization():
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
 
         if team is None and is_game_admin():
@@ -146,13 +140,11 @@ def initialization():
 @main.route("/log")
 def server_log():
     log_directory = os.path.join(BASEDIR, "logs")
-    # log_filename = "app.log"
     
     if not is_game_admin():
         abort(404)
 
-    bearer_client = APIClient(session.get("token"), bearer=True)
-    current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
     
     log.info(f"{current_user.username}({current_user.id}) is checking the log file")
     
@@ -164,4 +156,3 @@ def server_log():
                 zipf.write(file_path, arcname)
 
     return send_file(log_directory + ".zip", as_attachment=True, download_name="logs.zip")
-    # return send_from_directory(log_directory, log_filename)

@@ -5,6 +5,7 @@ from zenora import APIClient
 
 from ..core import core
 from ..modules.checker import is_admin, is_game_admin
+from ..modules.auth import get_current_user
 from ..status_codes import STATUS_CODES
 from ..models import db
 
@@ -22,9 +23,8 @@ def log_user():
     if request.endpoint == "admin_api.save_game_auto":
         return
     
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         log.log(INFO, f"{yellow_text_color}User \"{current_user.username}\" is using an admin api: \"{request.endpoint}\"{reset_text_color}")
 
 

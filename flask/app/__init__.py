@@ -6,7 +6,7 @@ from flask_cors import CORS
 from flask.logging import default_handler
 from flask_wtf import CSRFProtect
 
-from .config import DevConfig, ProdConfig, BASEDIR
+from .config import DevConfig, ProdConfig, TestConfig, BASEDIR
 from .models import db
 from .modules.socketio import socketio
 from .core import core
@@ -84,9 +84,18 @@ def app_load_blueprints(app: Flask) -> None:
     app.register_blueprint(haha)
     
     
-def create_app() -> Flask:
+def create_app(config_class=None) -> Flask:
     """
     Initialize the app.
+    
+    Parameters
+    ----------
+    config_class : class, optional
+        A configuration class to load.  When ``None`` (the default) the
+        class is chosen automatically based on the ``PRODUCTION`` environment
+        variable (:class:`ProdConfig` when set, :class:`DevConfig`
+        otherwise).  Pass :class:`TestConfig` to get a fully isolated
+        in-memory configuration suitable for unit tests.
     
     Returns
     -------
@@ -95,7 +104,10 @@ def create_app() -> Flask:
     """
     init_logger(debug=True)
     app = Flask(__name__)
-    app.config.from_object(ProdConfig if os.getenv("PRODUCTION", "False").lower() in ("true", "1", "t") else DevConfig)
+    if config_class is not None:
+        app.config.from_object(config_class)
+    else:
+        app.config.from_object(ProdConfig if os.getenv("PRODUCTION", "False").lower() in ("true", "1", "t") else DevConfig)
     csrf = CSRFProtect(app)
     CORS(app)
     app_load_blueprints(app)

@@ -7,6 +7,7 @@ from zenora import APIClient
 from ..core import core
 from ..config import RESET_TEXT_COLOR, YELLOW_TEXT_COLOR
 from ..modules.checker import is_admin, is_player
+from ..modules.auth import get_current_user
 from ..data import load_data
 from ..status_codes import STATUS_CODES, LANGUAGE
 
@@ -60,9 +61,8 @@ def stations():
     graph = core.metro.graph
     unlock_stations = []
     
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
         if team is not None:
             unlock_stations.extend(team.stations)
@@ -94,9 +94,8 @@ def station(name: str):
     
     unlock_stations = []
     
-    if "token" in session:
-        bearer_client = APIClient(session.get("token"), bearer=True)
-        current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    if current_user is not None:
         team, _ = core.check_player(current_user.username)
         if team is not None:
             unlock_stations.extend(team.stations)
@@ -539,11 +538,11 @@ def add_point(name: str, point: int):
         
     core.teams[name].point += point
     
-    bearer_client = APIClient(session.get("token"), bearer=True)
-    current_user = bearer_client.users.get_current_user()        
+    current_user = get_current_user()
+    username = current_user.username if current_user is not None else "unknown"
     
-    log.log(INFO, f"{YELLOW_TEXT_COLOR}User \"{current_user.username}\" added {point} point(s) to {name}{RESET_TEXT_COLOR}")
-    core.teams[name].add_point_log(point, f"By {current_user.username}")
+    log.log(INFO, f"{YELLOW_TEXT_COLOR}User \"{username}\" added {point} point(s) to {name}{RESET_TEXT_COLOR}")
+    core.teams[name].add_point_log(point, f"By {username}")
     
     return STATUS_CODES.S00000
 
@@ -584,11 +583,11 @@ def set_point(name: str, point: int):
     
     point = int(point)
     
-    bearer_client = APIClient(session.get("token"), bearer=True)
-    current_user = bearer_client.users.get_current_user()
+    current_user = get_current_user()
+    username = current_user.username if current_user is not None else "unknown"
 
-    log.log(INFO, f"{YELLOW_TEXT_COLOR}User \"{current_user.username}\" set {name}'s points to {point}{RESET_TEXT_COLOR}")
-    core.teams[name].add_point_log(point - core.teams[name].point, f"By {current_user.username}")
+    log.log(INFO, f"{YELLOW_TEXT_COLOR}User \"{username}\" set {name}'s points to {point}{RESET_TEXT_COLOR}")
+    core.teams[name].add_point_log(point - core.teams[name].point, f"By {username}")
     core.teams[name].point = point
     
     return STATUS_CODES.S00000

@@ -39,3 +39,19 @@ class DevConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(BASEDIR, "db.sqlite3")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class TestConfig(Config):
+    """Configuration used during automated testing.
+    
+    Uses an in-memory SQLite database, disables CSRF protection, and sets
+    ``TESTING=True`` so that :func:`~app.modules.auth.get_current_user`
+    reads from ``session["test_user"]`` instead of calling the Discord API.
+    """
+    
+    TESTING = True
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False
+    SECRET_KEY = "test-secret-key-not-for-production"

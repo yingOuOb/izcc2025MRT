@@ -141,7 +141,13 @@ class MetroSystem:
         if self.station_location:
             return None
         
-        response: list[dict] = requests.get(url, headers=headers).json()
+        try:
+            response: list[dict] = requests.get(url, headers=headers).json()
+        except requests.exceptions.RequestException as e:
+            log.warning(f"Failed to fetch station location data from API ({e}), falling back to local data.")
+            response = load_data("station_location")
+            self.station_location = {sl["StationName"]["Zh_tw"]: sl["StationPosition"]["GeoHash"] for sl in response}
+            return None
         
         # API可能被rate limit，改用本地資料
         if "message" in response:
@@ -166,12 +172,17 @@ class MetroSystem:
         if self.is_loaded:
             return None
         
-        response: list[dict] = requests.get(url, headers=headers).json()
-        
-        if "message" in response:
-            log.error(response["message"])
+        try:
+            response: list[dict] = requests.get(url, headers=headers).json()
+        except requests.exceptions.RequestException as e:
+            log.warning(f"Failed to fetch station data from API ({e}), falling back to local data.")
             response = load_data("api_data")
             self.is_loaded = True
+        else:
+            if "message" in response:
+                log.error(response["message"])
+                response = load_data("api_data")
+                self.is_loaded = True
                 
         if save:
             with open(os.path.join(BASEDIR, "data", "api_data.json"), "r+", encoding="utf-8") as file:
