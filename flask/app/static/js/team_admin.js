@@ -258,12 +258,16 @@ function getBluetoothApi() {
     return navigator.bluetooth || window.bluetooth;
 }
 
-function getBluetoothDiagnostics(bluetooth, error = null) {
+function getBluetoothDiagnostics(bluetooth, error = null, device = null) {
     return {
         isSecureContext: window.isSecureContext,
         hasNavigatorBluetooth: Boolean(navigator.bluetooth),
         hasRequestLEScan: Boolean(bluetooth && typeof bluetooth.requestLEScan === "function"),
+        hasRequestDevice: Boolean(bluetooth && typeof bluetooth.requestDevice === "function"),
         hasAddEventListener: Boolean(bluetooth && typeof bluetooth.addEventListener === "function"),
+        hasDeviceWatchAdvertisements: device
+            ? typeof device.watchAdvertisements === "function"
+            : "Unknown until a device is selected",
         errorName: error && error.name ? error.name : "None",
         errorMessage: error && error.message ? error.message : "None"
     };
@@ -274,7 +278,9 @@ function formatBluetoothDiagnostics(diagnostics) {
         `isSecureContext: ${diagnostics.isSecureContext}`,
         `navigator.bluetooth: ${diagnostics.hasNavigatorBluetooth}`,
         `requestLEScan: ${diagnostics.hasRequestLEScan}`,
+        `requestDevice: ${diagnostics.hasRequestDevice}`,
         `addEventListener: ${diagnostics.hasAddEventListener}`,
+        `device.watchAdvertisements: ${diagnostics.hasDeviceWatchAdvertisements}`,
         `error.name: ${diagnostics.errorName}`,
         `error.message: ${diagnostics.errorMessage}`
     ].join("\n");
@@ -315,6 +321,68 @@ async function scanWithWebBluetooth() {
     return pickNearestBeacon(Array.from(beacons.values()));
 }
 
+async function requestIBeaconDevice(bluetooth) {
+    try {
+        return await bluetooth.requestDevice({
+            filters: [{
+                manufacturerData: [{
+                    companyIdentifier: APPLE_COMPANY_IDENTIFIER,
+                    dataPrefix: new Uint8Array([0x02, 0x15])
+                }]
+            }],
+            optionalManufacturerData: [APPLE_COMPANY_IDENTIFIER]
+        });
+    } catch (error) {
+        if (!(error instanceof TypeError)) {
+            throw error;
+        }
+
+        console.warn("Manufacturer data filter is unsupported, falling back to the generic BLE device picker:", error);
+        return bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalManufacturerData: [APPLE_COMPANY_IDENTIFIER]
+        });
+    }
+}
+
+async function scanWithBluetoothDeviceAdvertisements() {
+    const bluetooth = getBluetoothApi();
+    const device = await requestIBeaconDevice(bluetooth);
+    if (!device
+        || typeof device.watchAdvertisements !== "function"
+        || typeof device.addEventListener !== "function") {
+        const error = new Error("The selected Bluetooth device does not support watchAdvertisements().");
+        error.name = "NotSupportedError";
+        error.bluetoothDevice = device;
+        throw error;
+    }
+
+    const beacons = new Map();
+    const onAdvertisement = event => {
+        const beacon = parseIBeaconAdvertisement(event);
+        if (!beacon) {
+            return;
+        }
+
+        const key = `${beacon.uuid}/${beacon.major}/${beacon.minor}`;
+        const previous = beacons.get(key);
+        if (!previous || Number(beacon.rssi) > Number(previous.rssi)) {
+            beacons.set(key, beacon);
+        }
+    };
+
+    device.addEventListener("advertisementreceived", onAdvertisement);
+
+    try {
+        await device.watchAdvertisements();
+        await new Promise(resolve => setTimeout(resolve, BEACON_SCAN_DURATION_MS));
+    } finally {
+        device.removeEventListener("advertisementreceived", onAdvertisement);
+    }
+
+    return pickNearestBeacon(Array.from(beacons.values()));
+}
+
 async function showDetectedBeacon(beacon) {
     await Swal.fire({
         title: "偵測到 Beacon",
@@ -336,6 +404,8 @@ async function sendBeaconPos() {
     const hasWebBluetoothScan = bluetooth
         && typeof bluetooth.requestLEScan === "function"
         && typeof bluetooth.addEventListener === "function";
+    const hasBluetoothDevicePicker = bluetooth
+        && typeof bluetooth.requestDevice === "function";
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
         || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
@@ -349,7 +419,7 @@ async function sendBeaconPos() {
         return;
     }
 
-    if (!hasHtml5Plus && !hasWebBluetoothScan) {
+    if (!hasHtml5Plus && !hasWebBluetoothScan && !hasBluetoothDevicePicker) {
         const diagnostics = getBluetoothDiagnostics(bluetooth);
         console.warn("Beacon scan API is unavailable:", diagnostics);
         await Swal.fire({
@@ -369,7 +439,9 @@ async function sendBeaconPos() {
     try {
         const beacon = hasHtml5Plus
             ? await scanWithHtml5Plus()
-            : await scanWithWebBluetooth();
+            : hasWebBluetoothScan
+                ? await scanWithWebBluetooth()
+                : await scanWithBluetoothDeviceAdvertisements();
 
         if (!beacon) {
             await Swal.fire({
@@ -406,7 +478,7 @@ async function sendBeaconPos() {
                 }
             });
     } catch (error) {
-        const diagnostics = getBluetoothDiagnostics(bluetooth, error);
+        const diagnostics = getBluetoothDiagnostics(bluetooth, error, error.bluetoothDevice);
         console.error("Error scanning beacons:", diagnostics, error);
         const permissionDenied = error && error.name === "NotAllowedError";
         const scanUnsupported = error && error.name === "NotSupportedError";
