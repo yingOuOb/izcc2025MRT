@@ -258,6 +258,28 @@ function getBluetoothApi() {
     return navigator.bluetooth || window.bluetooth;
 }
 
+function getBluetoothDiagnostics(bluetooth, error = null) {
+    return {
+        isSecureContext: window.isSecureContext,
+        hasNavigatorBluetooth: Boolean(navigator.bluetooth),
+        hasRequestLEScan: Boolean(bluetooth && typeof bluetooth.requestLEScan === "function"),
+        hasAddEventListener: Boolean(bluetooth && typeof bluetooth.addEventListener === "function"),
+        errorName: error && error.name ? error.name : "None",
+        errorMessage: error && error.message ? error.message : "None"
+    };
+}
+
+function formatBluetoothDiagnostics(diagnostics) {
+    return [
+        `isSecureContext: ${diagnostics.isSecureContext}`,
+        `navigator.bluetooth: ${diagnostics.hasNavigatorBluetooth}`,
+        `requestLEScan: ${diagnostics.hasRequestLEScan}`,
+        `addEventListener: ${diagnostics.hasAddEventListener}`,
+        `error.name: ${diagnostics.errorName}`,
+        `error.message: ${diagnostics.errorMessage}`
+    ].join("\n");
+}
+
 async function scanWithWebBluetooth() {
     const bluetooth = getBluetoothApi();
     const beacons = new Map();
@@ -293,47 +315,6 @@ async function scanWithWebBluetooth() {
     return pickNearestBeacon(Array.from(beacons.values()));
 }
 
-async function scanWithBluetoothWatchAdvertisements() {
-    const bluetooth = getBluetoothApi();
-    const beacons = new Map();
-    const abortController = new AbortController();
-    const onAdvertisement = event => {
-        const beacon = parseIBeaconAdvertisement(event);
-        if (!beacon) {
-            return;
-        }
-
-        const key = `${beacon.uuid}/${beacon.major}/${beacon.minor}`;
-        const previous = beacons.get(key);
-        if (!previous || Number(beacon.rssi) > Number(previous.rssi)) {
-            beacons.set(key, beacon);
-        }
-    };
-
-    bluetooth.addEventListener("advertisementreceived", onAdvertisement);
-
-    let watcher;
-    try {
-        watcher = await bluetooth.watchAdvertisements({
-            acceptAllAdvertisements: true,
-            keepRepeatedDevices: true,
-            signal: abortController.signal
-        });
-        await new Promise(resolve => setTimeout(resolve, BEACON_SCAN_DURATION_MS));
-    } finally {
-        abortController.abort();
-        if (watcher && typeof watcher.stop === "function") {
-            watcher.stop();
-        }
-        if (typeof bluetooth.unwatchAdvertisements === "function") {
-            bluetooth.unwatchAdvertisements();
-        }
-        bluetooth.removeEventListener("advertisementreceived", onAdvertisement);
-    }
-
-    return pickNearestBeacon(Array.from(beacons.values()));
-}
-
 async function showDetectedBeacon(beacon) {
     await Swal.fire({
         title: "偵測到 Beacon",
@@ -352,24 +333,11 @@ async function sendBeaconPos() {
     const team = document.querySelector("#team").innerHTML;
     const bluetooth = getBluetoothApi();
     const hasHtml5Plus = window.plus && window.plus.ibeacon;
-    const hasBluetoothWatchAdvertisements = bluetooth
-        && typeof bluetooth.watchAdvertisements === "function"
-        && typeof bluetooth.addEventListener === "function";
     const hasWebBluetoothScan = bluetooth
         && typeof bluetooth.requestLEScan === "function"
         && typeof bluetooth.addEventListener === "function";
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
         || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-    if (!hasHtml5Plus && !hasBluetoothWatchAdvertisements && isIOS) {
-        await Swal.fire({
-            title: "iPhone 瀏覽器無法掃描 Beacon",
-            text: "Safari 和 Chrome 無法讓一般網頁掃描 iBeacon。請改用 Bluefy，並在 Bluefy 設定中允許 Watch Advertisements。",
-            icon: "warning",
-            confirmButtonText: "OK"
-        });
-        return;
-    }
 
     if (!hasHtml5Plus && !window.isSecureContext) {
         await Swal.fire({
@@ -381,10 +349,17 @@ async function sendBeaconPos() {
         return;
     }
 
-    if (!hasHtml5Plus && !hasBluetoothWatchAdvertisements && !hasWebBluetoothScan) {
+    if (!hasHtml5Plus && !hasWebBluetoothScan) {
+        const diagnostics = getBluetoothDiagnostics(bluetooth);
+        console.warn("Beacon scan API is unavailable:", diagnostics);
         await Swal.fire({
-            title: "此瀏覽器沒有 Beacon 掃描 API",
-            text: "請在 iPhone 使用 Bluefy，或在支援 requestLEScan() 的 Chrome 測試。一般瀏覽器無法掃描 iBeacon 廣播。",
+            title: isIOS ? "iPhone 瀏覽器無法掃描 Beacon" : "此瀏覽器沒有 Beacon 掃描 API",
+            text: [
+                "請在 iPhone 使用 Bluefy，並在 Bluefy 設定中開啟 Enable BLE Advertisements。Safari 和 Chrome 無法讓一般網頁掃描 iBeacon。",
+                "",
+                "診斷資訊：",
+                formatBluetoothDiagnostics(diagnostics)
+            ].join("\n"),
             icon: "warning",
             confirmButtonText: "OK"
         });
@@ -394,9 +369,7 @@ async function sendBeaconPos() {
     try {
         const beacon = hasHtml5Plus
             ? await scanWithHtml5Plus()
-            : hasBluetoothWatchAdvertisements
-                ? await scanWithBluetoothWatchAdvertisements()
-                : await scanWithWebBluetooth();
+            : await scanWithWebBluetooth();
 
         if (!beacon) {
             await Swal.fire({
@@ -433,16 +406,23 @@ async function sendBeaconPos() {
                 }
             });
     } catch (error) {
-        console.error("Error scanning beacons:", error);
+        const diagnostics = getBluetoothDiagnostics(bluetooth, error);
+        console.error("Error scanning beacons:", diagnostics, error);
         const permissionDenied = error && error.name === "NotAllowedError";
         const scanUnsupported = error && error.name === "NotSupportedError";
+        const guidance = permissionDenied
+            ? "請允許藍牙權限後再試一次。"
+            : scanUnsupported
+                ? "目前瀏覽器不支援廣播掃描。若使用 Bluefy，請在設定中開啟 Enable BLE Advertisements。"
+                : "請確認藍牙已開啟，並允許 App 使用藍牙與定位權限。若使用 Bluefy，也請開啟 Enable BLE Advertisements。";
         await Swal.fire({
             title: "無法掃描 Beacon",
-            text: permissionDenied
-                ? "請允許藍牙權限後再試一次。"
-                : scanUnsupported
-                    ? "目前瀏覽器不支援廣播掃描。若使用 Bluefy，請在設定中允許 Watch Advertisements。"
-                    : "請確認藍牙已開啟，並允許 App 使用藍牙與定位權限。若使用 Bluefy，也請開啟 Watch Advertisements。",
+            text: [
+                guidance,
+                "",
+                "診斷資訊：",
+                formatBluetoothDiagnostics(diagnostics)
+            ].join("\n"),
             icon: "error",
             confirmButtonText: "OK"
         });
