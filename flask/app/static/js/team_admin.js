@@ -166,3 +166,230 @@ function arrive_target() {
             }
         })
 }
+
+const BEACON_SCAN_DURATION_MS = 2500;
+const APPLE_COMPANY_IDENTIFIER = 0x004c;
+
+function pickNearestBeacon(beacons) {
+    if (!Array.isArray(beacons) || beacons.length === 0) {
+        return null;
+    }
+
+    const scored = beacons.map(beacon => {
+        const accuracy = Number(beacon.accuracy);
+        const rssi = Number(beacon.rssi);
+        return {
+            beacon,
+            accuracy: Number.isFinite(accuracy) && accuracy > 0
+                ? accuracy
+                : Number.POSITIVE_INFINITY,
+            rssi: Number.isFinite(rssi) ? rssi : Number.NEGATIVE_INFINITY
+        };
+    });
+
+    scored.sort((a, b) => {
+        if (a.accuracy !== b.accuracy) {
+            return a.accuracy - b.accuracy;
+        }
+        return b.rssi - a.rssi;
+    });
+
+    return scored[0].beacon;
+}
+
+function scanWithHtml5Plus() {
+    const ibeacon = window.plus.ibeacon;
+
+    return new Promise((resolve, reject) => {
+        const stopDiscovery = () => {
+            try {
+                ibeacon.stopBeaconDiscovery({});
+            } catch (error) {
+                console.warn("Failed to stop HTML5+ beacon discovery:", error);
+            }
+        };
+
+        ibeacon.startBeaconDiscovery({
+            success: () => {
+                setTimeout(() => {
+                    ibeacon.getBeacons({
+                        success: event => {
+                            stopDiscovery();
+                            resolve(pickNearestBeacon(event.beacons));
+                        },
+                        fail: error => {
+                            stopDiscovery();
+                            reject(error);
+                        }
+                    });
+                }, BEACON_SCAN_DURATION_MS);
+            },
+            fail: reject
+        });
+    });
+}
+
+function formatUuid(bytes) {
+    const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function parseIBeaconAdvertisement(event) {
+    const manufacturerData = event.manufacturerData;
+    const appleData = manufacturerData && manufacturerData.get(APPLE_COMPANY_IDENTIFIER);
+    if (!appleData || appleData.byteLength < 23) {
+        return null;
+    }
+
+    const bytes = new Uint8Array(appleData.buffer, appleData.byteOffset, appleData.byteLength);
+    if (bytes[0] !== 0x02 || bytes[1] !== 0x15) {
+        return null;
+    }
+
+    return {
+        uuid: formatUuid(bytes.slice(2, 18)),
+        major: (bytes[18] << 8) | bytes[19],
+        minor: (bytes[20] << 8) | bytes[21],
+        rssi: event.rssi
+    };
+}
+
+async function scanWithWebBluetooth() {
+    const bluetooth = navigator.bluetooth;
+    const beacons = new Map();
+    const onAdvertisement = event => {
+        const beacon = parseIBeaconAdvertisement(event);
+        if (!beacon) {
+            return;
+        }
+
+        const key = `${beacon.uuid}/${beacon.major}/${beacon.minor}`;
+        const previous = beacons.get(key);
+        if (!previous || Number(beacon.rssi) > Number(previous.rssi)) {
+            beacons.set(key, beacon);
+        }
+    };
+
+    bluetooth.addEventListener("advertisementreceived", onAdvertisement);
+
+    let scan;
+    try {
+        scan = await bluetooth.requestLEScan({
+            acceptAllAdvertisements: true,
+            keepRepeatedDevices: true
+        });
+        await new Promise(resolve => setTimeout(resolve, BEACON_SCAN_DURATION_MS));
+    } finally {
+        if (scan) {
+            scan.stop();
+        }
+        bluetooth.removeEventListener("advertisementreceived", onAdvertisement);
+    }
+
+    return pickNearestBeacon(Array.from(beacons.values()));
+}
+
+async function showDetectedBeacon(beacon) {
+    await Swal.fire({
+        title: "偵測到 Beacon",
+        text: [
+            `UUID: ${beacon.uuid}`,
+            `Major: ${beacon.major}`,
+            `Minor: ${beacon.minor}`,
+            `RSSI: ${beacon.rssi ?? "未知"}`
+        ].join("\n"),
+        icon: "success",
+        confirmButtonText: "OK"
+    });
+}
+
+async function sendBeaconPos() {
+    const team = document.querySelector("#team").innerHTML;
+    const hasHtml5Plus = window.plus && window.plus.ibeacon;
+    const hasWebBluetoothScan = navigator.bluetooth
+        && typeof navigator.bluetooth.requestLEScan === "function";
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (!hasHtml5Plus && isIOS) {
+        await Swal.fire({
+            title: "iPhone 瀏覽器無法掃描 Beacon",
+            text: "iPhone 上的 Safari 和 Chrome 都無法讓一般網頁掃描 iBeacon。請使用支援 iBeacon 的 HTML5+ App。",
+            icon: "warning",
+            confirmButtonText: "OK"
+        });
+        return;
+    }
+
+    if (!hasHtml5Plus && !window.isSecureContext) {
+        await Swal.fire({
+            title: "需要 HTTPS",
+            text: "瀏覽器僅允許 HTTPS 網頁使用 Web Bluetooth。",
+            icon: "warning",
+            confirmButtonText: "OK"
+        });
+        return;
+    }
+
+    if (!hasHtml5Plus && !hasWebBluetoothScan) {
+        await Swal.fire({
+            title: "此瀏覽器沒有 Beacon 掃描 API",
+            text: "Chrome 的 Web Bluetooth Scanning 仍是未完成的實驗性功能，即使開啟 flags 也不保證可用。請使用支援 iBeacon 的 HTML5+ App。",
+            icon: "warning",
+            confirmButtonText: "OK"
+        });
+        return;
+    }
+
+    try {
+        const beacon = hasHtml5Plus
+            ? await scanWithHtml5Plus()
+            : await scanWithWebBluetooth();
+
+        if (!beacon) {
+            await Swal.fire({
+                title: "找不到 Beacon",
+                text: "附近未偵測到可用的 iBeacon 裝置。",
+                icon: "warning",
+                confirmButtonText: "OK"
+            });
+            return;
+        }
+
+        await showDetectedBeacon(beacon);
+        fetch(`/api/beacon/${team}/${beacon.uuid}/${beacon.major}/${beacon.minor}`)
+            .then(response => response.text())
+            .then(response => {
+                if (response === "Success" || response === "成功") {
+                    Swal.fire({
+                        title: "位置更新成功",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        willClose: () => {
+                            get_pos();
+                            mission_label();
+                        }
+                    });
+                }
+                else {
+                    Swal.fire({
+                        title: "位置更新失敗",
+                        text: response,
+                        icon: "warning",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
+    } catch (error) {
+        console.error("Error scanning beacons:", error);
+        const permissionDenied = error && error.name === "NotAllowedError";
+        await Swal.fire({
+            title: "無法掃描 Beacon",
+            text: permissionDenied
+                ? "請允許藍牙權限後再試一次。"
+                : "請確認藍牙已開啟，並允許 App 使用藍牙與定位權限。",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    }
+}

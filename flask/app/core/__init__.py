@@ -737,6 +737,54 @@ class Core:
         return data
     
     
+    def check_beacon(self, name: str, uuid: str, major: int, minor: int) -> dict | None:
+        """
+        Check the beacon of the team.
+        
+        Parameters
+        ----------
+        name: :type:`str`
+            The name of the team.
+            
+        uuid: :type:`str`
+            The UUID of the beacon.
+            
+        major: :type:`int`
+            The major value of the beacon.
+            
+        minor: :type:`int`
+            The minor value of the beacon.
+            
+        Returns
+        -------
+        data: :type:`dict[str, str]`
+            The data of the beacon.
+            
+            - location: :type:`str`
+                The current station of the team.
+        """
+        
+        if self.is_running is False:
+            log.warning("Game ended.")
+            return None
+        
+        if name not in self.teams.keys():
+            log.warning(f"Team {name} does not exist.")
+            return None
+        
+        if self.teams[name].is_imprisoned:
+            return None
+        
+        station = self.metro.find_station_by_beacon(uuid, major, minor)
+        if station:
+            self.teams[name].location = station
+            log.info(f"Team {name} moved to {station}.")
+        else:
+            log.warning(f"Team {name} is at an unknown location.")
+        
+        return station.name if station else None
+
+
     def reset_team(self, name: str) -> None:
         """
         Reset the team.

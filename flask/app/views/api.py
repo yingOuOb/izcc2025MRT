@@ -762,3 +762,37 @@ def get_users():
         abort(403)
     
     return jsonify(core.unknown_players)
+
+@api.route("/beacon/<team>/<uuid>/<major>/<minor>")
+def beacon_location(team: str, uuid: str, major: int, minor: int):
+    """
+    Send the beacon signal to the system.
+
+    Parameters
+    ----------
+    team: :type:`str`
+        The name of the team.
+    uuid: :type:`str`
+        The UUID of the beacon.
+    major: :type:`int`
+        The major of the beacon.
+    minor: :type:`int`
+        The minor of the beacon.
+    Returns
+    -------
+    result: :type:`str`
+        The station name of the beacon.
+    """
+    
+    if not is_admin():
+        abort(403)
+
+    if team not in core.teams:
+        return STATUS_CODES.S00004
+    
+    major = int(major)
+    minor = int(minor)
+    
+    station = core.metro.find_station_by_beacon(uuid, major, minor)
+
+    return jsonify({"station": station.name if station else None})

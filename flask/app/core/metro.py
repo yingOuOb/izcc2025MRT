@@ -3,6 +3,7 @@ import random
 import requests
 import logging
 import os
+import sqlite3
 from typing import Any
 
 from ..config import BASEDIR
@@ -250,6 +251,110 @@ class MetroSystem:
         """
                 
         return self.__dict__.get(name, None)
+    
+    def find_station_by_beacon(self, uuid: str, major: int, minor: int) -> Station | None:
+        """
+        Find the station object by beacon information.
+        
+        Parameters
+        ----------
+        uuid: :type:`str`
+            The uuid of the beacon.
+            
+        major: :type:`int`
+            The major of the beacon.
+            
+        minor: :type:`int`
+            The minor of the beacon.
+            
+        Returns
+        -------
+        station: :class:`Station`
+            The station object.
+        """
+        
+        # 解密 Beacon 的 Major & Minor 值，得到 Beacon ID (BID)
+        # 透過 Beacon ID (BID) 找到對應的站點名稱，最後回傳該站點物件
+        # 解密公式與北捷資料庫來自:https://github.com/lucasw0908/YTP-Hackathon/
+
+        try:
+            major = int(major)
+            minor = int(minor)
+        except (TypeError, ValueError):
+            log.warning("Invalid beacon values: major=%s minor=%s", major, minor)
+            return None
+
+        def _j(major_value: int, minor_value: int) -> int:
+            return ((major_value & 127) << 7) | (minor_value & 127)
+
+        def _k(major_value: int, minor_value: int) -> int:
+            return (major_value & 16256) | ((minor_value & 16256) >> 7)
+
+        def _l(major_value: int, minor_value: int) -> int:
+            return (((major_value & 49152) >> 12) | ((minor_value & 49152) >> 14)) & 7
+
+        r0 = _l(major, minor)
+        r1 = _j(major, minor)
+        r2 = _k(major, minor)
+        r3 = r0 & 7
+
+        if r3 == 0:
+            r2 = r2 ^ r1
+        elif r3 == 1:
+            r2 = r2 ^ r1
+            r2 = (~r2) & 0x3FFF
+        elif r3 == 2:
+            r2 = (r1 >> 2) & 0xFFF
+            r3 = (r1 << 12) & 0x3000
+            r2 = r2 | r3
+        elif r3 == 3:
+            r2 = (r1 << 2) & 0x3FFC
+            r3 = (r1 >> 12) & 0x3
+            r2 = r2 | r3
+        elif r3 == 4:
+            r3 = (r1 >> 2) & 0xFFF
+            r0 = (r1 << 12) & 0x3000
+            r3 = r3 | r0
+            r2 = r2 ^ r3
+        elif r3 == 5:
+            r3 = (r1 >> 2) & 0xFFF
+            r0 = (r1 << 12) & 0x3000
+            r3 = r3 | r0
+            r2 = r2 ^ r3
+            r2 = (~r2) & 0x3FFF
+        elif r3 == 6:
+            r3 = (r1 << 2) & 0x3FFC
+            r0 = (r1 >> 12) & 0x3
+            r3 = r3 | r0
+            r2 = r2 ^ r3
+        elif r3 == 7:
+            r3 = (r1 << 2) & 0x3FFC
+            r0 = (r1 >> 12) & 0x3
+            r3 = r3 | r0
+            r2 = r2 ^ r3
+            r2 = (~r2) & 0x3FFF
+        else:
+            r2 = -1
+
+        bid = r2 & 0x1FFF
+
+        db_path = os.path.join(BASEDIR, "data", "trtc_db.sqlite3")
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.execute("SELECT SID FROM BEACON WHERE BID = ? LIMIT 1", (bid,))
+                row = cursor.fetchone()
+                if row is None:
+                    return None
+
+                station_code = row[0]
+                for station in self.__dict__.values():
+                    if isinstance(station, Station) and station.id == station_code:
+                        return station
+
+                return None
+        except sqlite3.Error:
+            log.exception("Failed to look up beacon station.")
+            return None
     
     
     def move(self, name: str) -> list[str] | None:
